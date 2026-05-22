@@ -1,14 +1,14 @@
-// Simulação em memória (tipo "banco fake")
-let sessoes = [];
-let idCounter = 1;
+
+import { Session } from '../models/sessao.model.js';
 
 /**
  * POST http://localhost:3000/sessao/start
- * 
+ *
  * Inicia uma nova sessão
  */
 const startSessao = async (req, res) => {
     try {
+
         const { user_id } = req.body || {};
 
         if (!user_id) {
@@ -17,28 +17,28 @@ const startSessao = async (req, res) => {
             });
         }
 
-        const novaSessao = {
-            id: idCounter++,
+        const novaSessao = await Session.create({
             user_id,
             data_login: new Date(),
             data_logout: null,
             qtd_minutos_sessao: null
-        };
-
-        sessoes.push(novaSessao);
+        });
 
         return res.status(201).json(novaSessao);
 
     } catch (error) {
+
         return res.status(500).json({
             message: "Erro ao iniciar sessão",
             details: error.message
         });
+
     }
 };
 
 const endSessao = async (req, res) => {
     try {
+
         const id = req.params.id ? parseInt(req.params.id) : null;
 
         if (!id) {
@@ -47,7 +47,7 @@ const endSessao = async (req, res) => {
             });
         }
 
-        const sessao = sessoes.find(s => s.id === id);
+        const sessao = await Session.findByPk(id);
 
         if (!sessao) {
             return res.status(404).json({
@@ -60,23 +60,31 @@ const endSessao = async (req, res) => {
         const diffMs = data_logout - new Date(sessao.data_login);
         const minutos = Math.floor(diffMs / 1000 / 60);
 
-        sessao.data_logout = data_logout;
-        sessao.qtd_minutos_sessao = minutos;
+        await sessao.update({
+            data_logout,
+            qtd_minutos_sessao: minutos
+        });
 
         return res.json(sessao);
 
     } catch (error) {
+
         return res.status(500).json({
             message: "Erro ao finalizar sessão",
             details: error.message
         });
+
     }
 };
+
 
 // Tempo total de sessões do usuário
 const getTempoTotalSessoes = async (req, res) => {
     try {
-        const user_id = req.params.user_id ? parseInt(req.params.user_id) : null;
+
+        const user_id = req.params.user_id
+            ? parseInt(req.params.user_id)
+            : null;
 
         if (!user_id) {
             return res.status(400).json({
@@ -84,7 +92,11 @@ const getTempoTotalSessoes = async (req, res) => {
             });
         }
 
-        const sessoesDoUsuario = sessoes.filter(s => s.user_id === user_id);
+        const sessoesDoUsuario = await Session.findAll({
+            where: {
+                user_id
+            }
+        });
 
         let totalMinutos = 0;
 
@@ -97,10 +109,12 @@ const getTempoTotalSessoes = async (req, res) => {
         });
 
     } catch (error) {
+
         return res.status(500).json({
             message: "Erro ao calcular tempo total",
             details: error.message
         });
+
     }
 };
 
