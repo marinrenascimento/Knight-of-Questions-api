@@ -44,7 +44,6 @@ Segue abaixo um resumo das funcionalidades de cada controlador:
 - Atualização de flashcard
 - Deleção de flashcard
 
-
 ### Perguntas
 - Criação de pergunta
 - Listagem de pergunta
@@ -63,7 +62,18 @@ Segue abaixo um resumo das funcionalidades de cada controlador:
 
 ## Como rodar o projeto?
 
-- Iniciar o docker:
+- Criar uma pasta no computador, entrar nela por meio de uma IDE e clonar o repositório:
+
+```bash
+mkdir knight-of-questions
+cd knight-of-questions
+git init
+git clone https://github.com/marinrenascimento/Knight-of-Questions-api.git
+cd Knight-of-Questions-api
+git checkout main
+```
+
+- Iniciar o docker (abrir o aplicativo e rodar o container):
 
 ```bash
 docker compose up -d
@@ -73,6 +83,8 @@ docker compose up -d
 ```bash
 npm install
 ```
+
+- Ajuste o nome do arquivo .env.example para .env
 
 - Rodar as migrations
 ```bash
