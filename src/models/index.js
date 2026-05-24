@@ -16,8 +16,8 @@ export function initModels() {
   Avatar.hasMany(User, { as: 'usuarios', foreignKey: 'id_avatar' });
 
   // User - Ofensiva
-  User.hasOne(UserOfensiva, { as: 'ofensiva', foreignKey: 'user_id' });
-  UserOfensiva.belongsTo(User, { as: 'usuario', foreignKey: 'user_id' });
+  User.hasOne(UserOfensiva, { as: 'ofensiva', foreignKey: 'id_user' });
+  UserOfensiva.belongsTo(User, { as: 'usuario', foreignKey: 'id_user' });
 
 }
 
