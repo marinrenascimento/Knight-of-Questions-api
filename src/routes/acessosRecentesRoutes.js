@@ -1,8 +1,10 @@
-import express from 'express';
-import { listarAcessos } from '../controllers/AcessosRecentesController.js';
+import express from "express";
+import { AcessosRecentesController } from "../controllers/acessosRecentesController.js";
 
 const router = express.Router();
 
-router.get('/', listarAcessos);
+router.get("/:userId", AcessosRecentesController.getAllAcessosRecentesByUser);
 
-export default router;
+router.post("/:userId", AcessosRecentesController.createAcessoRecente);
+
+export { router as acessosRecentesRoutes };
