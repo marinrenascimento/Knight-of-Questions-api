@@ -1,9 +1,9 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/sequelize.js';
 
-export class Session extends Model { }
+export class UserSessao extends Model { }
 
-Session.init(
+UserSessao.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -14,25 +14,30 @@ Session.init(
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-
       references: {
         model: 'Users',
         key: 'id',
       },
     },
 
-    criado_em: {
+    data_login: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,
+    },
+
+    data_logout: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: null,
     },
   },
 
   {
     sequelize,
-    modelName: 'Session',
-    tableName: 'Sessions',
+    modelName: 'UserSessao',
+    tableName: 'user_sessao',
     timestamps: false,
-    underscored: false,
+    underscored: true,
   },
 );

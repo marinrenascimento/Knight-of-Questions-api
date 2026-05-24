@@ -1,5 +1,5 @@
 export async function up({ queryInterface, Sequelize }) {
-    await queryInterface.createTable('Sessions', {
+    await queryInterface.createTable('user_sessao', {
         id: {
             type: Sequelize.INTEGER,
             primaryKey: true,
@@ -9,24 +9,28 @@ export async function up({ queryInterface, Sequelize }) {
         user_id: {
             type: Sequelize.INTEGER,
             allowNull: false,
-
             references: {
                 model: 'Users',
                 key: 'id',
             },
-
             onDelete: 'CASCADE',
             onUpdate: 'CASCADE',
         },
 
-        criado_em: {
+        data_login: {
             type: Sequelize.DATE,
             allowNull: false,
-            defaultValue: Sequelize.NOW,
+            defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+        },
+
+        data_logout: {
+            type: Sequelize.DATE,
+            allowNull: true,
+            defaultValue: null,
         },
     });
 }
 
 export async function down({ queryInterface }) {
-    await queryInterface.dropTable('Sessions');
+    await queryInterface.dropTable('user_sessao');
 }

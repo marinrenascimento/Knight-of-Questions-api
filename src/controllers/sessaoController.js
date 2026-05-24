@@ -1,5 +1,5 @@
 
-import { Session } from '../models/sessao.model.js';
+import { UserSessao } from '../models/sessao.model.js';
 
 /**
  * POST http://localhost:3000/sessao/start
@@ -17,11 +17,10 @@ const startSessao = async (req, res) => {
             });
         }
 
-        const novaSessao = await Session.create({
+        const novaSessao = await UserSessao.create({
             user_id,
             data_login: new Date(),
-            data_logout: null,
-            qtd_minutos_sessao: null
+            data_logout: null
         });
 
         return res.status(201).json(novaSessao);
@@ -36,6 +35,11 @@ const startSessao = async (req, res) => {
     }
 };
 
+/**
+ * PUT http://localhost:3000/sessao/end/:id
+ *
+ * Finaliza uma sessão
+ */
 const endSessao = async (req, res) => {
     try {
 
@@ -47,7 +51,7 @@ const endSessao = async (req, res) => {
             });
         }
 
-        const sessao = await Session.findByPk(id);
+        const sessao = await UserSessao.findByPk(id);
 
         if (!sessao) {
             return res.status(404).json({
@@ -57,12 +61,8 @@ const endSessao = async (req, res) => {
 
         const data_logout = new Date();
 
-        const diffMs = data_logout - new Date(sessao.data_login);
-        const minutos = Math.floor(diffMs / 1000 / 60);
-
         await sessao.update({
-            data_logout,
-            qtd_minutos_sessao: minutos
+            data_logout
         });
 
         return res.json(sessao);
@@ -78,7 +78,11 @@ const endSessao = async (req, res) => {
 };
 
 
-// Tempo total de sessões do usuário
+/*
+ * GET http://localhost:3000/sessao/tempo/:user_id
+
+ * Calcula o tempo total de sessões de um usuário
+ */
 const getTempoTotalSessoes = async (req, res) => {
     try {
 
@@ -92,7 +96,7 @@ const getTempoTotalSessoes = async (req, res) => {
             });
         }
 
-        const sessoesDoUsuario = await Session.findAll({
+        const sessoesDoUsuario = await UserSessao.findAll({
             where: {
                 user_id
             }
@@ -101,7 +105,11 @@ const getTempoTotalSessoes = async (req, res) => {
         let totalMinutos = 0;
 
         for (let i = 0; i < sessoesDoUsuario.length; i++) {
-            totalMinutos += sessoesDoUsuario[i].qtd_minutos_sessao || 0;
+            const sessao = sessoesDoUsuario[i];
+            if (sessao.data_logout && sessao.data_login) {
+                const diff = new Date(sessao.data_logout) - new Date(sessao.data_login);
+                totalMinutos += diff / 1000 / 60;
+            }
         }
 
         return res.json({
