@@ -50,7 +50,6 @@ export const finishDeckReview = async (req, res) => {
       return res.status(404).json({ message: 'Revisão não encontrada.' });
     }
 
-    // Apenas o dono da revisão ou um admin pode finalizá-la
     if (review.id_usuario !== id_usuario && req.authUser.role !== 'admin') {
       return res.status(403).json({ message: 'Sem permissão para finalizar esta revisão.' });
     }
@@ -63,8 +62,7 @@ export const finishDeckReview = async (req, res) => {
     review.qtd_flashcards_revisados = qtd_flashcards_revisados;
     await review.save();
 
-    // Lógica de pontuação (ex: 5 pontos por flashcard revisado)
-    const pontosGanhos = qtd_flashcards_revisados * 5; 
+    const pontosGanhos = qtd_flashcards_revisados * 5;
     const user = await User.findByPk(id_usuario);
     if (user) {
       user.pontos += pontosGanhos;
@@ -101,10 +99,10 @@ export const getHistoricoReviewsByDeck = async (req, res) => {
 
     const historico = reviews.map(rev => {
       let tempo_gasto_segundos = null;
-      
+
       if (rev.iniciado_em && rev.terminado_em) {
         const diffTempo = new Date(rev.terminado_em) - new Date(rev.iniciado_em);
-        tempo_gasto_segundos = Math.floor(diffTempo / 1000); // Converte de milissegundos para segundos
+        tempo_gasto_segundos = Math.floor(diffTempo / 1000);
       }
 
       return {

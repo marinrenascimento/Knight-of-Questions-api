@@ -1,13 +1,11 @@
 import { User, HistoricoPontos } from '../models/index.js';
 
-// Mapeamento de Pontos por Ação
 const TABELA_PONTOS = {
   'cards': 2,
   'questoes': 3,
   'jogos': 1
 };
 
-// Mapeamento de Patentes (Ranks) por Nível
 const getRankPorNivel = (nivel) => {
   if (nivel >= 18) return 'Diamante';
   if (nivel >= 15) return 'Esmeralda';
@@ -18,7 +16,6 @@ const getRankPorNivel = (nivel) => {
   return 'Bronze';
 };
 
-// Mapeamento de Avatares/Recompensas por Nível
 const getRecompensaPorNivel = (nivel) => {
   const recompensas = {
     0: 'Cavaleiro',
@@ -43,9 +40,9 @@ const getRecompensaPorNivel = (nivel) => {
     19: 'Arco e flecha para o elfo',
     20: 'Fundo personalizado (sol e nuvens)'
   };
-  
+
   if (nivel > 20) return 'Todas as recompensas base desbloqueadas';
-  
+
   return recompensas[nivel] || 'Nenhuma recompensa mapeada';
 };
 
@@ -81,11 +78,15 @@ export const getPontosByUser = async (req, res) => {
 export const addPontosByUser = async (req, res) => {
   try {
     const id_usuario = req.authUser.id;
-    const { acao, quantidade } = req.body;
+    const { acao, quantidade } = req.body ?? {};
+
+    if (!acao) {
+      return res.status(400).json({ message: 'Ação é obrigatória.' });
+    }
 
     if (!TABELA_PONTOS[acao]) {
-      return res.status(400).json({ 
-        message: 'Ação inválida. As ações permitidas são: cards, questoes, jogos.' 
+      return res.status(400).json({
+        message: 'Ação inválida. As ações permitidas são: cards, questoes, jogos.'
       });
     }
 
@@ -95,18 +96,15 @@ export const addPontosByUser = async (req, res) => {
 
     const pontosGanhos = TABELA_PONTOS[acao] * quantidade;
 
-    // Registra no histórico
     const historico = await HistoricoPontos.create({
       id_usuario,
       acao,
       pontos_ganhos: pontosGanhos
     });
 
-    // Atualiza o usuário
     const user = await User.findByPk(id_usuario);
     user.pontos += pontosGanhos;
 
-    // Verifica se subiu de nível (1 nível a cada 1000 pontos)
     const nivelCalculado = Math.floor(user.pontos / 1000);
     let subiuDeNivel = false;
     let novaRecompensa = null;
