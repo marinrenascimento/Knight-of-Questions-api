@@ -1,19 +1,10 @@
-import express from 'express';
+import express from "express";
+import { OfensivaController } from "../controllers/ofensivaController.js";
 
 const router = express.Router();
 
-export const updateOfensiva = (req, res) => {
-    const { id } = req.params;
+router.get("/:userId", OfensivaController.getOfensivaByUser);
 
-    if (!id) {
-        return res.status(400).json({ erro: "ID não informado" });
-    }
-
-    res.status(200).json({
-        mensagem: `Ofensiva atualizada para o usuário ${id}`
-    });
-};
-
-router.put('/update/:id', updateOfensiva);
+router.post("/update/:userId", OfensivaController.updateOfensiva);
 
 export default router;
