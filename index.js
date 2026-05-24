@@ -8,6 +8,9 @@ import { bootstrapDb } from './src/db/bootstrap.js';
 import authRoutes from './src/routes/authRoutes.js';
 import ofensivaRoutes from './src/routes/ofensivaRoutes.js';
 import acessosRecentesRoutes from './src/routes/acessosRecentesRoutes.js';
+import rankRoutes from './src/routes/rankRoutes.js';
+import deckReviewRoutes from './src/routes/deckReviewRoutes.js';
+import pontosRoutes from './src/routes/pontosRoutes.js';
 import swaggerUi from 'swagger-ui-express';
 import { createRequire } from 'module';
 
@@ -27,7 +30,9 @@ app.use('/avatares', avatarRoutes);
 app.use('/auth', authRoutes);
 app.use('/ofensiva', ofensivaRoutes);
 app.use('/acessos', acessosRecentesRoutes);
-
+app.use('/rankings', rankRoutes);
+app.use('/deck-reviews', deckReviewRoutes);
+app.use('/pontos', pontosRoutes);
 /**
  * Documentação do Swagger
  * 
