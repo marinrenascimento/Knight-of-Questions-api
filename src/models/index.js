@@ -1,6 +1,7 @@
 import { User } from './user.model.js';
 import { Post } from './post.model.js';
 import { Avatar } from './avatar.model.js';
+import { UserOfensiva } from './ofensiva.model.js';
 
 let initialized = false;
 
@@ -16,5 +17,20 @@ export function initModels() {
   User.belongsTo(Avatar, { as: 'avatar', foreignKey: 'id_avatar' });
   Avatar.hasMany(User, { as: 'usuarios', foreignKey: 'id_avatar' });
 }
+  // Ofensiva - Usuário
+  User.hasOne(UserOfensiva, {
+    foreignKey: 'user_id',
+    as: 'ofensiva'
+  });
 
-export { User, Post, Avatar };
+  UserOfensiva.belongsTo(User, {
+    foreignKey: 'user_id',
+    as: 'usuario'
+  });
+
+export { User, Post, Avatar, UserOfensiva };
+
+  
+
+
+
