@@ -1,5 +1,5 @@
 import express from 'express';
-import { listarAcessos } from '../controllers/AcessosRecentesController.js';
+import { listarAcessos } from '../controllers/acessosRecentesController.js';
 
 const router = express.Router();
 
