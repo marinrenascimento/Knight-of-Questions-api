@@ -1,9 +1,15 @@
 import { User } from './user.model.js';
 import { Avatar } from './avatar.model.js';
+<<<<<<< HEAD
 import { Deck } from './deck.model.js';
 import { Flashcard } from './flashcard.model.js';
 import { Disciplina } from './disciplina.model.js';
 import { Conteudo } from './conteudo.model.js';
+=======
+import { Rank } from './rank.model.js';
+import { DeckReview } from './deckReview.model.js';
+import { HistoricoPontos } from './historicoPontos.model.js';
+>>>>>>> 0b03328d88138fdd982087c844de7da067d9d920
 
 let initialized = false;
 
@@ -39,6 +45,10 @@ export function initModels() {
 
 }
 
+<<<<<<< HEAD
 export { 
   User, Avatar, Disciplina, Conteudo, Deck, Flashcard
 };
+=======
+export { User, Avatar, Rank, DeckReview, HistoricoPontos };
+>>>>>>> 0b03328d88138fdd982087c844de7da067d9d920
