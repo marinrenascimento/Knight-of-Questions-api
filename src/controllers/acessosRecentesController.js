@@ -1,70 +1,57 @@
-// Dados temporários para teste
-
-let acessosRecentes = [
-  {
-    id: 1,
-    user_id: 1,
-    nome: "Deck de HTTP",
-    tipo: "deck",
-    data_acesso: "2026-05-23"
-  },
-  {
-    id: 2,
-    user_id: 1,
-    nome: "Prova de Redes",
-    tipo: "prova",
-    data_acesso: "2026-05-24"
-  }
-];
+import { sequelize } from "../config/sequelize.js";
+import { QueryTypes } from "sequelize";
 
 export class AcessosRecentesController {
 
-  // Lista os últimos decks e avaliações acessados pelo usuário
-  static getAllAcessosRecentesByUser(req, res) {
+  static async getAllAcessosRecentesByUser(req, res) {
+    try {
+      const { userId } = req.params;
 
-    const { userId } = req.params;
+      const deckRecente = await sequelize.query(
+        `
+        SELECT 
+          deck_review.*,
+          deck.*
+        FROM deck_review
+        INNER JOIN deck ON deck.id = deck_review.deck_id
+        WHERE deck_review.user_id = :userId
+        ORDER BY deck_review.created_at DESC
+        LIMIT 1
+        `,
+        {
+          replacements: { userId },
+          type: QueryTypes.SELECT
+        }
+      );
 
-    const acessos = acessosRecentes
-      .filter(acesso => acesso.user_id == userId)
-      .sort((a, b) => new Date(b.data_acesso) - new Date(a.data_acesso));
+      const avaliacaoRecente = await sequelize.query(
+        `
+        SELECT 
+          avaliacao_review.*,
+          avaliacao.*
+        FROM avaliacao_review
+        INNER JOIN avaliacao ON avaliacao.id = avaliacao_review.avaliacao_id
+        WHERE avaliacao_review.user_id = :userId
+        ORDER BY avaliacao_review.created_at DESC
+        LIMIT 1
+        `,
+        {
+          replacements: { userId },
+          type: QueryTypes.SELECT
+        }
+      );
 
-    return res.status(200).json(acessos);
+      return res.status(200).json({
+        avaliacao_recente: avaliacaoRecente[0] || null,
+        deck_recente: deckRecente[0] || null
+      });
 
-  }
-
-  // Registra um acesso recente ao abrir um deck ou prova
-  static createAcessoRecente(req, res) {
-
-    const { userId } = req.params;
-    const { nome, tipo } = req.body;
-
-    if (!nome || !tipo) {
-      return res.status(400).json({
-        message: "Nome e tipo são obrigatórios"
+    } catch (error) {
+      return res.status(500).json({
+        message: "Erro ao buscar acessos recentes",
+        error: error.message
       });
     }
-
-    if (tipo !== "deck" && tipo !== "prova") {
-      return res.status(400).json({
-        message: "Tipo inválido. Use 'deck' ou 'prova'."
-      });
-    }
-
-    const novoAcesso = {
-      id: acessosRecentes.length + 1,
-      user_id: Number(userId),
-      nome,
-      tipo,
-      data_acesso: new Date().toISOString().slice(0, 10)
-    };
-
-    acessosRecentes.push(novoAcesso);
-
-    return res.status(201).json({
-      message: "Acesso recente registrado com sucesso",
-      acesso: novoAcesso
-    });
-
   }
 
 }
