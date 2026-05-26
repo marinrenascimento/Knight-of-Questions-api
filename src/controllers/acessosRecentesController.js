@@ -3,6 +3,11 @@ import { QueryTypes } from "sequelize";
 
 export class AcessosRecentesController {
 
+  /**
+   * GET http://localhost:3000/acessos-recentes/:userId
+   * 
+   * Busca os acessos recentes de um usuário
+   */
   static async getAllAcessosRecentesByUser(req, res) {
     try {
       const { userId } = req.params;

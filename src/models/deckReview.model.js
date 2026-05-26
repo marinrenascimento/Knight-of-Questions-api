@@ -1,7 +1,7 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/sequelize.js';
 
-export class DeckReview extends Model {}
+export class DeckReview extends Model { }
 
 DeckReview.init(
   {
@@ -35,7 +35,7 @@ DeckReview.init(
   {
     sequelize,
     modelName: 'DeckReview',
-    tableName: 'DeckReviews',
+    tableName: 'deck_review',
     timestamps: false,
   }
 );

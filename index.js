@@ -29,7 +29,7 @@ app.use('/sessao', sessaoRoutes);
 app.use('/avatares', avatarRoutes);
 app.use('/auth', authRoutes);
 app.use('/ofensiva', ofensivaRoutes);
-app.use('/acessos', acessosRecentesRoutes);
+app.use('/acessos-recentes', acessosRecentesRoutes);
 app.use('/rankings', rankRoutes);
 app.use('/deck-reviews', deckReviewRoutes);
 app.use('/pontos', pontosRoutes);
