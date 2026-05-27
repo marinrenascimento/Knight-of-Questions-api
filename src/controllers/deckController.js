@@ -1,9 +1,12 @@
 import { Deck } from '../models/deck.model.js';
-import { Flashcard } from '../models/flashcard.model.js'; // Assumindo que este model exista
+import { Flashcard } from '../models/flashcard.model.js';
 import { sequelize } from '../config/sequelize.js';
 
-// GET /users/:id_user/decks
-// getAllDecksByUser - busca todos os decks do usuário
+/**
+ * GET /users/:id_user/decks
+ * 
+ * Busca todos os decks do usuário
+ */
 export const getAllDecksByUser = async (req, res) => {
     try {
         const id_user = parseInt(req.params.id_user);
@@ -18,32 +21,33 @@ export const getAllDecksByUser = async (req, res) => {
     }
 };
 
-// POST /users/:id_user/decks
-// createDeckAndFlashcardsUsuario - cria um deck e cria os flashcards associados
+/**
+ * POST /users/:id_user/decks
+ * 
+ * Cria um deck e cria os flashcards associados
+ */
 export const createDeckAndFlashcardsUsuario = async (req, res) => {
     const transaction = await sequelize.transaction();
-    
+
     try {
         const id_user = parseInt(req.params.id_user);
-        const { nome, descricao, flashcards } = req.body;
+        const { nome, descricao, flashcards } = req.body ?? {};
 
         if (!nome) {
             return res.status(400).json({ message: "O campo 'nome' é obrigatório." });
         }
 
-        // 1. Cria o deck
         const novoDeck = await Deck.create(
             { nome, descricao: descricao || null, id_user },
             { transaction }
         );
 
-        // 2. Se houver flashcards no payload, cria eles vinculados ao deck recém-criado
         if (flashcards && Array.isArray(flashcards) && flashcards.length > 0) {
             const flashcardsParaCriar = flashcards.map(card => ({
                 ...card,
-                id_deck: novoDeck.id 
+                id_deck: novoDeck.id
             }));
-            
+
             await Flashcard.bulkCreate(flashcardsParaCriar, { transaction });
         }
 
@@ -55,13 +59,16 @@ export const createDeckAndFlashcardsUsuario = async (req, res) => {
     }
 };
 
-// PUT /users/:id_user/decks/:id
-// updateInfoDeck - atualiza nome e descrição do deck
+/** 
+ * PUT /deck/update/:id_user/:id
+ * 
+ * Atualiza nome e descrição do deck
+ */
 export const updateInfoDeck = async (req, res) => {
     try {
         const id = parseInt(req.params.id);
         const id_user = parseInt(req.params.id_user);
-        const { nome, descricao } = req.body;
+        const { nome, descricao } = req.body ?? {};
 
         const deck = await Deck.findOne({ where: { id, id_user } });
 
@@ -69,7 +76,6 @@ export const updateInfoDeck = async (req, res) => {
             return res.status(404).json({ message: "Deck não encontrado." });
         }
 
-        // Atualiza apenas os campos enviados
         deck.nome = nome || deck.nome;
         deck.descricao = descricao !== undefined ? descricao : deck.descricao;
 
@@ -81,8 +87,10 @@ export const updateInfoDeck = async (req, res) => {
     }
 };
 
-// DELETE /users/:id_user/decks/:id
-// deleteDeckAndFlashcards - remove o deck e todos os flashcards vinculados em cascata
+/** DELETE /deck/delete/:id_user/:id
+ * 
+ * deleteDeckAndFlashcards - remove o deck e todos os flashcards vinculados em cascata
+ */
 export const deleteDeckAndFlashcards = async (req, res) => {
     const transaction = await sequelize.transaction();
 
@@ -98,9 +106,9 @@ export const deleteDeckAndFlashcards = async (req, res) => {
         }
 
         // 1. Deleta os flashcards associados (caso não haja ON DELETE CASCADE no banco)
-        await Flashcard.destroy({ 
-            where: { id_deck: id }, 
-            transaction 
+        await Flashcard.destroy({
+            where: { id_deck: id },
+            transaction
         });
 
         // 2. Deleta o deck
@@ -114,13 +122,14 @@ export const deleteDeckAndFlashcards = async (req, res) => {
     }
 };
 
-// PATCH /users/:id_user/decks/:id/review
-// savePeriodoReview - define o intervalo de revisão espaçada do deck em dias
+/** PATCH /deck/review/:id_user/:id
+ * savePeriodoReview - define o intervalo de revisão espaçada do deck em dias
+ */
 export const savePeriodoReview = async (req, res) => {
     try {
         const id = parseInt(req.params.id);
         const id_user = parseInt(req.params.id_user);
-        const { dias_revisao } = req.body; // Quantidade de dias para o intervalo
+        const { dias_revisao } = req.body ?? {};
 
         if (dias_revisao === undefined || dias_revisao < 0) {
             return res.status(400).json({ message: "Valor inválido para o período de revisão." });
@@ -136,7 +145,7 @@ export const savePeriodoReview = async (req, res) => {
         o período de revisão. Para que o método abaixo funcione, será necessário 
         adicionar o campo `periodo_revisao` (ou similar) no model Deck e no PostgreSQL.
         */
-        
+
         // deck.periodo_revisao = dias_revisao; 
         // await deck.save();
 

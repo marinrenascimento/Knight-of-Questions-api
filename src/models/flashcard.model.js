@@ -22,7 +22,7 @@ Flashcard.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Decks',
+        model: 'deck',
         key: 'id',
       },
     },
