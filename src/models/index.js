@@ -1,5 +1,8 @@
 import { User } from './user.model.js';
 import { Avatar } from './avatar.model.js';
+import { Rank } from './rank.model.js';
+import { DeckReview } from './deckReview.model.js';
+import { HistoricoPontos } from './historicoPontos.model.js';
 import { Disciplina } from './disciplina.model.js';
 import { Conteudo } from './conteudo.model.js';
 import { Deck } from './deck.model.js';
@@ -19,7 +22,6 @@ export function initModels() {
   // Avatar - Usuário
   User.belongsTo(Avatar, { as: 'avatar', foreignKey: 'id_avatar' });
   Avatar.hasMany(User, { as: 'usuarios', foreignKey: 'id_avatar' });
-  
   // User - Deck
   User.hasMany(Deck, { as: 'decks', foreignKey: 'id_user' });
   Deck.belongsTo(User, { as: 'usuario', foreignKey: 'id_user' });
@@ -84,5 +86,9 @@ export {
   Pergunta, 
   Alternativa, 
   AvaliacaoReview, 
-  RespostaUsuario 
+  RespostaUsuario,
+  Rank,
+  DeckReview,
+  HistoricoPontos,
+
 };
