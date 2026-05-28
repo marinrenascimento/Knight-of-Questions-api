@@ -4,7 +4,6 @@ import { sequelize } from '../../config/sequelize.js';
 
 describe('Conteudo Model', () => {
   beforeAll(async () => {
-    await sequelize.sync({ force: true });
   });
 
   afterAll(async () => {

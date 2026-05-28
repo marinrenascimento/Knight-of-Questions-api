@@ -1,52 +1,49 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/sequelize.js';
 
-export class Pergunta extends Model {}
+export class AvaliacaoReview extends Model {}
 
-Pergunta.init(
+AvaliacaoReview.init(
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    enunciado: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-    },
-    nivel_dificuldade: {
+    id_user: {
       type: DataTypes.INTEGER,
       allowNull: true,
-    },
-    disciplina_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
       references: {
-        model: 'Disciplinas',
+        model: 'Users',
         key: 'id',
       },
     },
     id_avaliacao: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'Avaliacoes',
         key: 'id',
       },
     },
-    conteudo_id: {
+    iniciado_em: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    terminado_em: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    qtd_questoes_respondidas: {
       type: DataTypes.INTEGER,
       allowNull: true,
-      references: {
-        model: 'Conteudos',
-        key: 'id',
-      },
     },
   },
   {
     sequelize,
-    modelName: 'Pergunta',
-    tableName: 'Perguntas',
+    modelName: 'AvaliacaoReview',
+    tableName: 'AvaliacaoReviews',
     timestamps: false,
   }
 );

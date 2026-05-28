@@ -4,13 +4,8 @@ import {
     getAllAvaliacoesByUser,
     getAllAvaliacoesVestibulares,
     createAvaliacao,
-    updateInfoDeck,
-    deleteDeckAndFlashcards,
-    savePeriodoReview,
-    startAvaliacao,
-    finishAvaliacao,
-    getResultadoAvaliacao,
-    getAnotacoesByAvaliacao
+    updateInfoAvaliacao,
+    deleteAvaliacaoAndPerguntas
 } from '../controllers/avaliacaoController.js';
 import { requireAuth, requireRole } from '../middlewares/authMiddleware.js';
 
@@ -25,28 +20,13 @@ router.get('/vestibular/all', requireAuth, requireRole('estudante'), getAllAvali
 // http://localhost:3000/avaliacoes/:id
 router.get('/:id', requireAuth, requireRole('estudante'), getAvaliacaoById);
 
-// http://localhost:3000/avaliacoes/resultado/:reviewId
-router.get('/resultado/:reviewId', requireAuth, requireRole('estudante'), getResultadoAvaliacao);
-
-// http://localhost:3000/avaliacoes/anotacoes/:reviewId
-router.get('/anotacoes/:reviewId', requireAuth, requireRole('estudante'), getAnotacoesByAvaliacao);
-
 // http://localhost:3000/avaliacoes/create
 router.post('/create', requireAuth, requireRole('estudante'), createAvaliacao);
 
-// http://localhost:3000/avaliacoes/periodo-review
-router.post('/periodo-review', requireAuth, requireRole('estudante'), savePeriodoReview);
-
-// http://localhost:3000/avaliacoes/start
-router.post('/start', requireAuth, requireRole('estudante'), startAvaliacao);
-
-// http://localhost:3000/avaliacoes/finish
-router.post('/finish', requireAuth, requireRole('estudante'), finishAvaliacao);
-
 // http://localhost:3000/avaliacoes/update/1
-router.patch('/update/:id', requireAuth, requireRole('estudante'), updateInfoDeck);
+router.patch('/update/:id', requireAuth, requireRole('estudante'), updateInfoAvaliacao);
 
 // http://localhost:3000/avaliacoes/delete/:id
-router.delete('/delete/:id', requireAuth, requireRole('estudante'), deleteDeckAndFlashcards);
+router.delete('/delete/:id', requireAuth, requireRole('estudante'), deleteAvaliacaoAndPerguntas);
 
 export default router;

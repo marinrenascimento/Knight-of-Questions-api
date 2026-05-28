@@ -22,7 +22,7 @@ Flashcard.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'deck',
+        model: 'Decks',
         key: 'id',
       },
     },
@@ -34,7 +34,7 @@ Flashcard.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'disciplina',
+        model: 'Disciplinas',
         key: 'id',
       },
     },
@@ -42,7 +42,7 @@ Flashcard.init(
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'conteudo',
+        model: 'Conteudos',
         key: 'id',
       },
     },
@@ -50,7 +50,7 @@ Flashcard.init(
   {
     sequelize,
     modelName: 'Flashcard',
-    tableName: 'flashcard',
+    tableName: 'Flashcards',
     timestamps: false,
   }
 );

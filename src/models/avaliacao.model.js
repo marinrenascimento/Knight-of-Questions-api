@@ -30,7 +30,7 @@ Avaliacao.init(
   {
     sequelize,
     modelName: 'Avaliacao',
-    tableName: 'avaliacao',
+    tableName: 'Avaliacoes',
     timestamps: false,
   }
 );

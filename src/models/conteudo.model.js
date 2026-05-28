@@ -18,7 +18,7 @@ Conteudo.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'disciplina',
+        model: 'Disciplinas',
         key: 'id',
       },
     },
@@ -26,7 +26,7 @@ Conteudo.init(
   {
     sequelize,
     modelName: 'Conteudo',
-    tableName: 'conteudo',
+    tableName: 'Conteudos',
     timestamps: false,
   }
 );

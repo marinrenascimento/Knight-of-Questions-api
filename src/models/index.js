@@ -7,6 +7,8 @@ import { Flashcard } from './flashcard.model.js';
 import { Avaliacao } from './avaliacao.model.js';
 import { Pergunta } from './pergunta.model.js';
 import { Alternativa } from './alternativa.model.js';
+import { AvaliacaoReview } from './avaiacaoreview.model.js';
+import { RespostaUsuario } from './respostausuario.model.js';
 
 let initialized = false;
 
@@ -30,16 +32,57 @@ export function initModels() {
   Deck.hasMany(Flashcard, { as: 'flashcards', foreignKey: 'id_deck' });
   Flashcard.belongsTo(Deck, { as: 'deck', foreignKey: 'id_deck' });
 
-  // Pergunta com suas entidades
-  Pergunta.belongsTo(Disciplina, { as: 'disciplina', foreignKey: 'disciplina_id' });
+  // Avaliacao - Pergunta
+  Avaliacao.hasMany(Pergunta, { as: 'perguntas', foreignKey: 'id_avaliacao' });
   Pergunta.belongsTo(Avaliacao, { as: 'avaliacao', foreignKey: 'id_avaliacao' });
+
+  // Disciplina - Pergunta
+  Disciplina.hasMany(Pergunta, { as: 'perguntas', foreignKey: 'disciplina_id' });
+  Pergunta.belongsTo(Disciplina, { as: 'disciplina', foreignKey: 'disciplina_id' });
+
+  // Conteudo - Pergunta
+  Conteudo.hasMany(Pergunta, { as: 'perguntas', foreignKey: 'conteudo_id' });
   Pergunta.belongsTo(Conteudo, { as: 'conteudo', foreignKey: 'conteudo_id' });
 
-  // Pergunta - Alternativa (Adicionado)
+  // Pergunta - Alternativa
   Pergunta.hasMany(Alternativa, { as: 'alternativas', foreignKey: 'id_pergunta' });
   Alternativa.belongsTo(Pergunta, { as: 'pergunta', foreignKey: 'id_pergunta' });
+
+  // User - AvaliacaoReview
+  User.hasMany(AvaliacaoReview, { as: 'reviews', foreignKey: 'id_user' });
+  AvaliacaoReview.belongsTo(User, { as: 'usuario', foreignKey: 'id_user' });
+
+  // Avaliacao - AvaliacaoReview
+  Avaliacao.hasMany(AvaliacaoReview, { as: 'reviews', foreignKey: 'id_avaliacao' });
+  AvaliacaoReview.belongsTo(Avaliacao, { as: 'avaliacao', foreignKey: 'id_avaliacao' });
+
+  // AvaliacaoReview - RespostaUsuario
+  AvaliacaoReview.hasMany(RespostaUsuario, { as: 'respostas', foreignKey: 'id_avaliacao_review' });
+  RespostaUsuario.belongsTo(AvaliacaoReview, { as: 'review', foreignKey: 'id_avaliacao_review' });
+
+  // User - RespostaUsuario
+  User.hasMany(RespostaUsuario, { as: 'respostas', foreignKey: 'id_user' });
+  RespostaUsuario.belongsTo(User, { as: 'usuario', foreignKey: 'id_user' });
+
+  // Pergunta - RespostaUsuario
+  Pergunta.hasMany(RespostaUsuario, { as: 'respostas', foreignKey: 'id_pergunta' });
+  RespostaUsuario.belongsTo(Pergunta, { as: 'pergunta', foreignKey: 'id_pergunta' });
+
+  // Alternativa - RespostaUsuario
+  Alternativa.hasMany(RespostaUsuario, { as: 'respostas', foreignKey: 'id_alternativa' });
+  RespostaUsuario.belongsTo(Alternativa, { as: 'alternativa', foreignKey: 'id_alternativa' });
 }
 
 export { 
-  User, Avatar, Disciplina, Conteudo, Deck, Flashcard, Avaliacao, Pergunta, Alternativa 
+  User, 
+  Avatar, 
+  Disciplina, 
+  Conteudo, 
+  Deck, 
+  Flashcard, 
+  Avaliacao, 
+  Pergunta, 
+  Alternativa, 
+  AvaliacaoReview, 
+  RespostaUsuario 
 };

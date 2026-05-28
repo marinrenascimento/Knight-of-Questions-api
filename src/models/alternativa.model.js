@@ -22,7 +22,7 @@ Alternativa.init(
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'pergunta',
+        model: 'Perguntas',
         key: 'id',
       },
     },
@@ -34,7 +34,7 @@ Alternativa.init(
   {
     sequelize,
     modelName: 'Alternativa',
-    tableName: 'alternativa',
+    tableName: 'Alternativas',
     timestamps: false,
   }
 );

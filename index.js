@@ -9,6 +9,7 @@ import { bootstrapDb } from './src/db/bootstrap.js';
 import authRoutes from './src/routes/authRoutes.js';
 import conteudoRoutes from './src/routes/conteudoRoutes.js';
 import avaliacaoRoutes from './src/routes/avaliacaoRoutes.js';
+import avaliacaoReviewRoutes from './src/routes/avaliacaoReviewRoutes.js';
 import perguntaRoutes from './src/routes/perguntaRoutes.js';
 import disciplinaRoutes from './src/routes/disciplinaRoutes.js'
 import flashcardRoutes from './src/routes/flashcardRoutes.js'
@@ -16,10 +17,6 @@ import ofensivaRoutes from './src/routes/ofensivaRoutes.js';
 import acessosRecentesRoutes from './src/routes/acessosRecentesRoutes.js';
 
 initModels();
-
-// Sincroniza os models com o banco (cria as tabelas que não existem)
-// await sequelize.sync({ alter: true }); 
-
 await bootstrapDb();
 const app = express();
 const port = Number.parseInt(process.env.PORT ?? '3000', 10);
@@ -33,12 +30,15 @@ app.use('/disciplinas', disciplinaRoutes);
 app.use('/conteudos', conteudoRoutes);
 app.use('/flashcards', flashcardRoutes);
 app.use('/avaliacoes', avaliacaoRoutes);
+app.use('/avaliacao-review', avaliacaoReviewRoutes);
 app.use('/perguntas', perguntaRoutes);
 app.use('/ofensiva', ofensivaRoutes);
 app.use('/acessos', acessosRecentesRoutes);
+
 app.get('/', (req, res) => {
     res.send('API com Express funcionando!');
 });
+
 app.listen(port, () => {
     console.log(`Servidor rodando em http://localhost:${port}`);
 });

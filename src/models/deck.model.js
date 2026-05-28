@@ -35,7 +35,7 @@ Deck.init(
   {
     sequelize,
     modelName: 'Deck',
-    tableName: 'deck',
+    tableName: 'Decks',
     timestamps: false,
   }
 );

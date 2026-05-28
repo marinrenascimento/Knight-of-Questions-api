@@ -1,26 +1,17 @@
 export async function up({ queryInterface, Sequelize }) {
-    await queryInterface.createTable('avaliacao', {
-        id: {
-            type: Sequelize.INTEGER,
-            primaryKey: true,
-            autoIncrement: true
-        },
-        titulo: {
-            type: Sequelize.STRING(200),
-            allowNull: false
-        },
+    await queryInterface.createTable('Avaliacoes', {
+        id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+        titulo: { type: Sequelize.STRING(200), allowNull: false },
         id_user: {
             type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'usuario',
-                key: 'id'
-            }
+            allowNull: true,
+            references: { model: 'Users', key: 'id' },
+            onDelete: 'SET NULL',
+            onUpdate: 'CASCADE'
         },
-        is_vestibular: {
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
-        }
+        is_vestibular: { type: Sequelize.BOOLEAN, allowNull: false, defaultValue: false }
     });
+}
+export async function down({ queryInterface }) {
+    await queryInterface.dropTable('Avaliacoes');
 }
