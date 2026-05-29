@@ -19,6 +19,6 @@ Disciplina.init(
     sequelize,
     modelName: 'Disciplina',
     tableName: 'Disciplinas',
-    timestamps: false, 
+    timestamps: false,
   }
 );

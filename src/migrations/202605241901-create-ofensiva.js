@@ -1,27 +1,27 @@
 export async function up({ queryInterface, Sequelize }) {
-  await queryInterface.createTable('Conteudos', {
+  await queryInterface.createTable('user_ofensiva', {
     id: {
       type: Sequelize.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    nome: {
-      type: Sequelize.STRING(200),
-      allowNull: false,
-    },
-    disciplina_id: {
+    user_id: {
       type: Sequelize.INTEGER,
       allowNull: false,
       references: {
-        model: 'Disciplinas',
+        model: 'Users',
         key: 'id',
       },
-      onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+    sequencia_dias: {
+      type: Sequelize.INTEGER,
+      defaultValue: 0,
     },
   });
 }
 
 export async function down({ queryInterface, Sequelize }) {
-  await queryInterface.dropTable('Conteudos');
+  await queryInterface.dropTable('user_ofensiva');
 }

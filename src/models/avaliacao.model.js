@@ -1,41 +1,36 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/sequelize.js';
 
-export class Deck extends Model { }
+export class Avaliacao extends Model {}
 
-Deck.init(
+Avaliacao.init(
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    nome: {
+    titulo: {
       type: DataTypes.STRING(200),
       allowNull: false,
     },
-    descricao: {
-      type: DataTypes.STRING(255),
-      allowNull: true,
-    },
-    criado_em: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
     id_user: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'Users',
         key: 'id',
       },
     },
+    is_vestibular: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   },
   {
     sequelize,
-    modelName: 'Deck',
-    tableName: 'Decks',
+    modelName: 'Avaliacao',
+    tableName: 'Avaliacoes',
     timestamps: false,
   }
 );

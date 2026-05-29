@@ -1,41 +1,40 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/sequelize.js';
 
-export class Deck extends Model { }
+export class Alternativa extends Model {}
 
-Deck.init(
+Alternativa.init(
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    nome: {
+    texto: {
       type: DataTypes.STRING(200),
-      allowNull: false,
+      allowNull: true,
+    },
+    is_correta: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+    },
+    id_pergunta: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'Perguntas',
+        key: 'id',
+      },
     },
     descricao: {
       type: DataTypes.STRING(255),
       allowNull: true,
     },
-    criado_em: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
-    id_user: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'Users',
-        key: 'id',
-      },
-    },
   },
   {
     sequelize,
-    modelName: 'Deck',
-    tableName: 'Decks',
+    modelName: 'Alternativa',
+    tableName: 'Alternativas',
     timestamps: false,
   }
 );

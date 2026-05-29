@@ -17,7 +17,7 @@ export async function up({ queryInterface, Sequelize }) {
       type: Sequelize.INTEGER,
       allowNull: false,
       references: {
-        model: 'deck',
+        model: 'Decks',
         key: 'id',
       },
       onUpdate: 'CASCADE',
@@ -50,6 +50,6 @@ export async function up({ queryInterface, Sequelize }) {
   });
 }
 
-export async function down({ queryInterface }) {
+export async function down({ queryInterface, Sequelize }) {
   await queryInterface.dropTable('Flashcards');
 }

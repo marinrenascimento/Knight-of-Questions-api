@@ -12,6 +12,6 @@ export async function up({ queryInterface, Sequelize }) {
   });
 }
 
-export async function down({ queryInterface }) {
+export async function down({ queryInterface, Sequelize }) {
   await queryInterface.dropTable('Disciplinas');
 }

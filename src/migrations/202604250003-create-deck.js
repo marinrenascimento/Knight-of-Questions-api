@@ -1,5 +1,5 @@
 export async function up({ queryInterface, Sequelize }) {
-  await queryInterface.createTable('deck', {
+  await queryInterface.createTable('Decks', {
     id: {
       type: Sequelize.INTEGER,
       primaryKey: true,
@@ -31,6 +31,6 @@ export async function up({ queryInterface, Sequelize }) {
   });
 }
 
-export async function down({ queryInterface }) {
-  await queryInterface.dropTable('deck');
+export async function down({ queryInterface, Sequelize }) {
+  await queryInterface.dropTable('Decks');
 }

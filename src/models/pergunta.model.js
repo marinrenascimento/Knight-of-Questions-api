@@ -1,36 +1,24 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/sequelize.js';
 
-export class Flashcard extends Model { }
+export class Pergunta extends Model {}
 
-Flashcard.init(
+Pergunta.init(
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    frente: {
+    enunciado: {
       type: DataTypes.STRING(255),
       allowNull: false,
     },
-    verso: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-    },
-    id_deck: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'Decks',
-        key: 'id',
-      },
-    },
-    dificuldade: {
+    nivel_dificuldade: {
       type: DataTypes.INTEGER,
       allowNull: true,
     },
-    id_disciplina: {
+    disciplina_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -38,9 +26,17 @@ Flashcard.init(
         key: 'id',
       },
     },
-    id_conteudo: {
+    id_avaliacao: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: 'Avaliacoes',
+        key: 'id',
+      },
+    },
+    conteudo_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
       references: {
         model: 'Conteudos',
         key: 'id',
@@ -49,8 +45,8 @@ Flashcard.init(
   },
   {
     sequelize,
-    modelName: 'Flashcard',
-    tableName: 'Flashcards',
+    modelName: 'Pergunta',
+    tableName: 'Perguntas',
     timestamps: false,
   }
 );
