@@ -10,7 +10,7 @@ import { HistoricoPontos } from './historicoPontos.model.js';
 import { Avaliacao } from './avaliacao.model.js';
 import { Pergunta } from './pergunta.model.js';
 import { Alternativa } from './alternativa.model.js';
-import { AvaliacaoReview } from './avaiacaoreview.model.js';
+import { AvaliacaoReview } from './avaliacaoReview.model.js';
 import { RespostaUsuario } from './respostausuario.model.js';
 import { UserSessao } from './sessao.model.js';
 import { UserOfensiva } from './ofensiva.model.js';

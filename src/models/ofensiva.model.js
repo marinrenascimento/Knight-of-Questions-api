@@ -1,7 +1,7 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../config/sequelize.js";
 
-export class UserOfensiva extends Model {}
+export class UserOfensiva extends Model { }
 
 UserOfensiva.init(
   {

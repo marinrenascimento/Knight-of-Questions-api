@@ -1,11 +1,8 @@
-import express from 'express';
+import express from "express";
 import { AcessosRecentesController } from "../controllers/acessosRecentesController.js";
-import { requireAuth } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
-router.get('/:userId', requireAuth, AcessosRecentesController.getAllAcessosRecentesByUser);
-
-router.post('/:userId', requireAuth, AcessosRecentesController.createAcessoRecente);
+router.get("/:userId", AcessosRecentesController.getAllAcessosRecentesByUser);
 
 export default router;

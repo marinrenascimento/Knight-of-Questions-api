@@ -44,7 +44,7 @@ app.use('/avaliacoes', avaliacaoRoutes);
 app.use('/avaliacao-review', avaliacaoReviewRoutes);
 app.use('/perguntas', perguntaRoutes);
 app.use('/ofensiva', ofensivaRoutes);
-app.use('/acessos', acessosRecentesRoutes);
+app.use('/acessos-recentes', acessosRecentesRoutes);
 app.use('/rankings', rankRoutes);
 app.use('/deck-reviews', deckReviewRoutes);
 app.use('/pontos', pontosRoutes);
