@@ -40,7 +40,7 @@ Flashcard.init(
     },
     id_conteudo: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
       references: {
         model: 'Conteudos',
         key: 'id',

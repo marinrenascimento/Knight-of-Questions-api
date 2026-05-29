@@ -1,17 +1,20 @@
 import { User } from './user.model.js';
 import { Avatar } from './avatar.model.js';
+import { Deck } from './deck.model.js';
+import { Flashcard } from './flashcard.model.js';
+import { Disciplina } from './disciplina.model.js';
+import { Conteudo } from './conteudo.model.js';
 import { Rank } from './rank.model.js';
 import { DeckReview } from './deckReview.model.js';
 import { HistoricoPontos } from './historicoPontos.model.js';
-import { Disciplina } from './disciplina.model.js';
-import { Conteudo } from './conteudo.model.js';
-import { Deck } from './deck.model.js';
-import { Flashcard } from './flashcard.model.js';
 import { Avaliacao } from './avaliacao.model.js';
 import { Pergunta } from './pergunta.model.js';
 import { Alternativa } from './alternativa.model.js';
 import { AvaliacaoReview } from './avaiacaoreview.model.js';
 import { RespostaUsuario } from './respostausuario.model.js';
+import { UserSessao } from './sessao.model.js';
+import { UserOfensiva } from './ofensiva.model.js';
+import { AcessoRecente } from './acessosRecentes.model.js';
 
 let initialized = false;
 
@@ -19,9 +22,10 @@ export function initModels() {
   if (initialized) return;
   initialized = true;
 
-  // Avatar - Usuário
+  // Avatar <-> User
   User.belongsTo(Avatar, { as: 'avatar', foreignKey: 'id_avatar' });
   Avatar.hasMany(User, { as: 'usuarios', foreignKey: 'id_avatar' });
+  
   // User - Deck
   User.hasMany(Deck, { as: 'decks', foreignKey: 'id_user' });
   Deck.belongsTo(User, { as: 'usuario', foreignKey: 'id_user' });
@@ -73,6 +77,38 @@ export function initModels() {
   // Alternativa - RespostaUsuario
   Alternativa.hasMany(RespostaUsuario, { as: 'respostas', foreignKey: 'id_alternativa' });
   RespostaUsuario.belongsTo(Alternativa, { as: 'alternativa', foreignKey: 'id_alternativa' });
+
+  // Disciplina <-> Flashcard 
+  Disciplina.hasMany(Flashcard, { as: 'flashcards_disciplina', foreignKey: 'id_disciplina' });
+  Flashcard.belongsTo(Disciplina, { as: 'disciplina', foreignKey: 'id_disciplina' });
+
+  // Conteudo <-> Flashcard (Opcional)
+  Conteudo.hasMany(Flashcard, { as: 'flashcards_conteudo', foreignKey: 'id_conteudo' });
+  Flashcard.belongsTo(Conteudo, { as: 'conteudo', foreignKey: 'id_conteudo' });
+
+  // User <-> UserSessao
+  User.hasMany(UserSessao, { as: 'sessoes', foreignKey: 'user_id' });
+  UserSessao.belongsTo(User, { as: 'usuario', foreignKey: 'user_id' });
+
+  // User <-> UserOfensiva
+  User.hasOne(UserOfensiva, { as: 'ofensiva', foreignKey: 'user_id' });
+  UserOfensiva.belongsTo(User, { as: 'usuario', foreignKey: 'user_id' });
+
+  // User <-> AcessoRecente
+  User.hasMany(AcessoRecente, { as: 'acessos_recentes', foreignKey: 'user_id' });
+  AcessoRecente.belongsTo(User, { as: 'usuario', foreignKey: 'user_id' });
+
+  // User <-> DeckReview
+  User.hasMany(DeckReview, { as: 'deck_reviews', foreignKey: 'id_usuario' });
+  DeckReview.belongsTo(User, { as: 'usuario', foreignKey: 'id_usuario' });
+
+  // Deck <-> DeckReview
+  Deck.hasMany(DeckReview, { as: 'reviews', foreignKey: 'id_deck' });
+  DeckReview.belongsTo(Deck, { as: 'deck', foreignKey: 'id_deck' });
+
+  // User <-> HistoricoPontos
+  User.hasMany(HistoricoPontos, { as: 'historico_pontos', foreignKey: 'id_usuario' });
+  HistoricoPontos.belongsTo(User, { as: 'usuario', foreignKey: 'id_usuario' });
 }
 
 export { 
@@ -90,5 +126,7 @@ export {
   Rank,
   DeckReview,
   HistoricoPontos,
-
+  UserSessao,
+  UserOfensiva,
+  AcessoRecente,
 };

@@ -19,6 +19,7 @@ import acessosRecentesRoutes from './src/routes/acessosRecentesRoutes.js';
 import rankRoutes from './src/routes/rankRoutes.js';
 import deckReviewRoutes from './src/routes/deckReviewRoutes.js';
 import pontosRoutes from './src/routes/pontosRoutes.js';
+import deckRoutes from './src/routes/deckRoutes.js'
 import swaggerUi from 'swagger-ui-express';
 import { createRequire } from 'module';
 
@@ -47,6 +48,7 @@ app.use('/acessos', acessosRecentesRoutes);
 app.use('/rankings', rankRoutes);
 app.use('/deck-reviews', deckReviewRoutes);
 app.use('/pontos', pontosRoutes);
+app.use('/deck', deckRoutes)
 
 /**
  * Documentação do Swagger

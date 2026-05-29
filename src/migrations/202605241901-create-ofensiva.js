@@ -1,5 +1,5 @@
 export async function up({ queryInterface, Sequelize }) {
-  await queryInterface.createTable('user_sessao', {
+  await queryInterface.createTable('user_ofensiva', {
     id: {
       type: Sequelize.INTEGER,
       primaryKey: true,
@@ -15,19 +15,13 @@ export async function up({ queryInterface, Sequelize }) {
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     },
-    data_login: {
-      type: Sequelize.DATE,
-      allowNull: false,
-      defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-    },
-    data_logout: {
-      type: Sequelize.DATE,
-      allowNull: true,
-      defaultValue: null,
+    sequencia_dias: {
+      type: Sequelize.INTEGER,
+      defaultValue: 0,
     },
   });
 }
 
 export async function down({ queryInterface, Sequelize }) {
-  await queryInterface.dropTable('user_sessao');
+  await queryInterface.dropTable('user_ofensiva');
 }

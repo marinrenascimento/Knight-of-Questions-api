@@ -1,27 +1,27 @@
 export async function up({ queryInterface, Sequelize }) {
-  await queryInterface.createTable('Ranks', {
+  await queryInterface.createTable('Conteudos', {
     id: {
       type: Sequelize.INTEGER,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     nome: {
       type: Sequelize.STRING(200),
       allowNull: false,
-      unique: true
     },
-    imagem_url: {
-      type: Sequelize.STRING(255),
-      allowNull: true
-    },
-    pontos_minimos: {
+    disciplina_id: {
       type: Sequelize.INTEGER,
       allowNull: false,
-      defaultValue: 0
-    }
+      references: {
+        model: 'Disciplinas',
+        key: 'id',
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
+    },
   });
 }
 
 export async function down({ queryInterface, Sequelize }) {
-  await queryInterface.dropTable('Ranks');
+  await queryInterface.dropTable('Conteudos');
 }
