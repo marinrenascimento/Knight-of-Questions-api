@@ -1,0 +1,76 @@
+import { Avaliacao, Pergunta } from '../models/index.js';
+import { sequelize } from '../config/sequelize.js';
+
+export const getAvaliacaoById = async (req, res) => {
+    try {
+        const id = parseInt(req.params.id, 10);
+        const avaliacao = await Avaliacao.findByPk(id);
+        const perguntas = await Pergunta.findAll({ where: { id_avaliacao: id } });
+        if (!avaliacao) return res.status(404).json({ message: 'Avaliação não encontrada' });
+        res.json({ ...avaliacao.toJSON(), perguntas });
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao buscar avaliação', error: err.message });
+    }
+};
+
+export const getAllAvaliacoesByUser = async (req, res) => {
+    try {
+        const userId = parseInt(req.params.userId, 10);
+        const avaliacoes = await Avaliacao.findAll({ where: { id_user: userId } });
+        res.json(avaliacoes);
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao buscar avaliações', error: err.message });
+    }
+};
+
+export const getAllAvaliacoesVestibulares = async (req, res) => {
+    try {
+        const avaliacoes = await Avaliacao.findAll({ where: { is_vestibular: true, id_user: null } });
+        res.json(avaliacoes);
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao buscar avaliações', error: err.message });
+    }
+};
+
+export const createAvaliacao = async (req, res) => {
+    try {
+        const { titulo, is_vestibular, id_user } = req.body;
+        if (!titulo) return res.status(400).json({ message: "O título é obrigatório." });
+        const novaAvaliacao = await Avaliacao.create({ titulo, is_vestibular, id_user });
+        res.status(201).json({ message: "Avaliação criada com sucesso!", avaliacao: novaAvaliacao });
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao criar avaliação', error: err.message });
+    }
+};
+
+export const updateInfoAvaliacao = async (req, res) => {
+    try {
+        const id = parseInt(req.params.id, 10);
+        const { titulo, is_vestibular } = req.body;
+        const avaliacao = await Avaliacao.findByPk(id);
+        if (!avaliacao) return res.status(404).json({ message: 'Avaliação não encontrada' });
+        await avaliacao.update({ titulo, is_vestibular });
+        res.json(avaliacao);
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao atualizar avaliação', error: err.message });
+    }
+};
+
+export const deleteAvaliacaoAndPerguntas = async (req, res) => {
+    const transaction = await sequelize.transaction();
+    try {
+        const id = parseInt(req.params.id, 10);
+        const avaliacao = await Avaliacao.findByPk(id, { transaction });
+        if (!avaliacao) {
+            await transaction.rollback();
+            return res.status(404).json({ message: 'Avaliação não encontrada' });
+        }
+        await Pergunta.destroy({ where: { id_avaliacao: id }, transaction });
+        await avaliacao.destroy({ transaction });
+        await transaction.commit();
+        res.json({ message: 'Avaliação e perguntas removidas com sucesso' });
+    } catch (err) {
+        await transaction.rollback();
+        res.status(500).json({ message: 'Erro ao deletar', error: err.message });
+    }
+};

@@ -44,12 +44,12 @@ describe('authMiddleware.requireAuth', () => {
     });
     it('deve chamar next quando token e usuário forem válidos', async () => {
         verifyAccessToken.mockReturnValue({ sub: '1' });
-        User.findByPk.mockResolvedValue({ id: 1, email: 'user@mail.com', name: 'User' });
+        User.findByPk.mockResolvedValue({ id: 1, email: 'user@mail.com', username: 'user1', role: 'estudante' });
         const req = { headers: { authorization: 'Bearer token-ok' } };
         const res = createRes();
         const next = vi.fn();
         await requireAuth(req, res, next);
         expect(next).toHaveBeenCalledTimes(1);
-        expect(req.authUser).toEqual({ id: 1, email: 'user@mail.com', name: 'User' });
+        expect(req.authUser).toEqual({ id: 1, email: 'user@mail.com', username: 'user1', role: 'estudante' });
     });
 });
