@@ -11,7 +11,7 @@ UserOfensiva.init(
       autoIncrement: true
     },
 
-    id_user: {
+    user_id: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
