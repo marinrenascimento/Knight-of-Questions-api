@@ -17,18 +17,18 @@ export class OfensivaController {
       }
 
       const ofensiva = await UserOfensiva.findOne({
-        where: { id_user: id_usuario }
+        where: { user_id: id_usuario }
       });
 
       if (!ofensiva) {
         return res.status(200).json({
-          id_user: id_usuario,
+          user_id: id_usuario,
           sequencia_dias: 0
         });
       }
 
       return res.status(200).json({
-        id_user: ofensiva.id_user,
+        user_id: ofensiva.user_id,
         sequencia_dias: ofensiva.sequencia_dias
       });
 
@@ -51,12 +51,12 @@ export class OfensivaController {
       const acao = req.body?.acao ?? null;
 
       let ofensiva = await UserOfensiva.findOne({
-        where: { id_user: id_usuario }
+        where: { user_id: id_usuario }
       });
 
       if (!ofensiva) {
         ofensiva = await UserOfensiva.create({
-          id_user: id_usuario,
+          user_id: id_usuario,
           sequencia_dias: 1
         });
 

@@ -50,7 +50,7 @@ export const finishDeckReview = async (req, res) => {
       return res.status(404).json({ message: 'Revisão não encontrada.' });
     }
 
-    if (review.id_usuario !== id_usuario && req.authUser.role !== 'admin') {
+    if (Number(review.id_usuario) !== Number(id_usuario) && req.authUser.role !== 'admin') {
       return res.status(403).json({ message: 'Sem permissão para finalizar esta revisão.' });
     }
 
@@ -72,6 +72,7 @@ export const finishDeckReview = async (req, res) => {
     res.json({
       message: 'Revisão finalizada com sucesso.',
       pontos_ganhos: pontosGanhos,
+      pontos_totais: user ? user.pontos : 0,
       review
     });
   } catch (err) {

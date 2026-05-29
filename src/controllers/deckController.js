@@ -115,42 +115,9 @@ export const deleteDeckAndFlashcards = async (req, res) => {
         await deck.destroy({ transaction });
 
         await transaction.commit();
-        res.status(204).send();
+        res.status(200).json({ message: "Deck e seus flashcards foram deletados com sucesso!" });
     } catch (error) {
         await transaction.rollback();
         res.status(500).json({ message: "Erro ao remover o deck.", error: error.message });
-    }
-};
-
-/** PATCH /deck/review/:id_user/:id
- * savePeriodoReview - define o intervalo de revisão espaçada do deck em dias
- */
-export const savePeriodoReview = async (req, res) => {
-    try {
-        const id = parseInt(req.params.id);
-        const id_user = parseInt(req.params.id_user);
-        const { dias_revisao } = req.body ?? {};
-
-        if (dias_revisao === undefined || dias_revisao < 0) {
-            return res.status(400).json({ message: "Valor inválido para o período de revisão." });
-        }
-
-        const deck = await Deck.findOne({ where: { id, id_user } });
-
-        if (!deck) {
-            return res.status(404).json({ message: "Deck não encontrado." });
-        }
-
-        /* ATENÇÃO: O model `deck.model.js` atual não possui uma coluna para armazenar 
-        o período de revisão. Para que o método abaixo funcione, será necessário 
-        adicionar o campo `periodo_revisao` (ou similar) no model Deck e no PostgreSQL.
-        */
-
-        // deck.periodo_revisao = dias_revisao; 
-        // await deck.save();
-
-        res.status(200).json({ message: "Período de revisão atualizado (Requer ajuste no Model)", dias_revisao });
-    } catch (error) {
-        res.status(500).json({ message: "Erro ao salvar período de revisão.", error: error.message });
     }
 };

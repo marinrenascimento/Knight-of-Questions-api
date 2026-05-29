@@ -1,4 +1,4 @@
-import { Avaliacao, Pergunta } from '../models/index.js';
+import { Avaliacao, Pergunta, Alternativa } from '../models/index.js';
 import { sequelize } from '../config/sequelize.js';
 
 export const getAvaliacaoById = async (req, res) => {
@@ -33,12 +33,43 @@ export const getAllAvaliacoesVestibulares = async (req, res) => {
 };
 
 export const createAvaliacao = async (req, res) => {
+    const transaction = await sequelize.transaction();
     try {
-        const { titulo, is_vestibular, id_user } = req.body;
-        if (!titulo) return res.status(400).json({ message: "O título é obrigatório." });
-        const novaAvaliacao = await Avaliacao.create({ titulo, is_vestibular, id_user });
+        const { titulo, is_vestibular, id_user, perguntas } = req.body;
+        if (!titulo) {
+            await transaction.rollback();
+            return res.status(400).json({ message: "O título é obrigatório." });
+        }
+
+        const novaAvaliacao = await Avaliacao.create({ titulo, is_vestibular, id_user }, { transaction });
+
+        if (perguntas && Array.isArray(perguntas)) {
+            for (const p of perguntas) {
+                const novaPergunta = await Pergunta.create({
+                    enunciado: p.enunciado,
+                    nivel_dificuldade: p.nivel_dificuldade,
+                    disciplina_id: p.disciplina_id,
+                    conteudo_id: p.conteudo_id,
+                    id_avaliacao: novaAvaliacao.id
+                }, { transaction });
+
+                if (p.alternativas && Array.isArray(p.alternativas)) {
+                    for (const alt of p.alternativas) {
+                        await Alternativa.create({
+                            texto: alt.texto,
+                            is_correta: alt.is_correta,
+                            descricao: alt.descricao,
+                            id_pergunta: novaPergunta.id
+                        }, { transaction });
+                    }
+                }
+            }
+        }
+
+        await transaction.commit();
         res.status(201).json({ message: "Avaliação criada com sucesso!", avaliacao: novaAvaliacao });
     } catch (err) {
+        await transaction.rollback();
         res.status(500).json({ message: 'Erro ao criar avaliação', error: err.message });
     }
 };

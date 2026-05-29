@@ -104,18 +104,25 @@ export const createCard = async (req, res) => {
 /**
  * PATCH /flashcards/update/:id
  * 
- * Edita um flashcard existente
+ * Edita um flashcard existente (suporta atualização parcial)
  */
 export const editCard = async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
         const { frente, verso } = req.body ?? {};
-        if (!frente || !verso) return res.status(400).json({ message: 'frente e verso são obrigatórios' });
+        
+        if (frente === undefined && verso === undefined) {
+            return res.status(400).json({ message: 'Ao menos um campo (frente ou verso) deve ser fornecido' });
+        }
         
         const card = await Flashcard.findByPk(id);
         if (!card) return res.status(404).json({ message: 'Flashcard não encontrado' });
         
-        await card.update({ frente, verso });
+        const updateData = {};
+        if (frente !== undefined) updateData.frente = frente;
+        if (verso !== undefined) updateData.verso = verso;
+
+        await card.update(updateData);
         res.json(card);
     } catch (err) {
         res.status(500).json({ message: 'Erro ao editar flashcard', error: err.message });

@@ -126,10 +126,3 @@ export const getAnotacoesByAvaliacao = async (req, res) => {
         res.status(500).json({ message: 'Erro ao buscar anotações', error: err.message });
     }
 };
-
-/**
- * Placeholder para salvar período de review
- */
-export const savePeriodoReview = async (req, res) => {
-    res.status(501).json({ message: 'Funcionalidade savePeriodoReview ainda não implementada.' });
-};

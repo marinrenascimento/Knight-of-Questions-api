@@ -35,7 +35,7 @@ DeckReview.init(
   {
     sequelize,
     modelName: 'DeckReview',
-    tableName: 'deck_review',
+    tableName: 'DeckReviews',
     timestamps: false,
   }
 );

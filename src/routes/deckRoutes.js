@@ -3,8 +3,7 @@ import {
     getAllDecksByUser,
     createDeckAndFlashcardsUsuario,
     updateInfoDeck,
-    deleteDeckAndFlashcards,
-    savePeriodoReview
+    deleteDeckAndFlashcards
 } from '../controllers/deckController.js';
 import { requireAuth } from '../middlewares/authMiddleware.js';
 
@@ -18,9 +17,6 @@ router.post('/create/:id_user', requireAuth, createDeckAndFlashcardsUsuario);
 
 // Rota: PUT /deck/update/:id_user/:id
 router.put('/update/:id_user/:id', requireAuth, updateInfoDeck);
-
-// Rota: PATCH /deck/review/:id_user/:id
-router.patch('/review/:id_user/:id', requireAuth, savePeriodoReview);
 
 // Rota: DELETE /deck/delete/:id_user/:id
 router.delete('/delete/:id_user/:id', requireAuth, deleteDeckAndFlashcards);

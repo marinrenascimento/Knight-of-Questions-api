@@ -67,16 +67,16 @@ export const createConteudo = async (req, res) => {
 /**
  * PATCH /conteudos/update/:id
  * 
- * Atualiza um conteúdo
+ * Atualiza um conteúdo (suporta atualização parcial)
  */
 export const updateConteudo = async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
-
         const { nome, disciplina_id } = req.body ?? {};
-        if (!nome || !disciplina_id) {
-            return res.status(400).json({
-                message: 'Nome e disciplina_id são obrigatórios'
+        
+        if (nome === undefined && disciplina_id === undefined) {
+            return res.status(400).json({ 
+                message: 'Ao menos um campo (nome ou disciplina_id) deve ser fornecido' 
             });
         }
 
@@ -87,7 +87,11 @@ export const updateConteudo = async (req, res) => {
             });
         }
 
-        await conteudo.update({ nome, disciplina_id });
+        const updateData = {};
+        if (nome !== undefined) updateData.nome = nome;
+        if (disciplina_id !== undefined) updateData.disciplina_id = disciplina_id;
+
+        await conteudo.update(updateData);
         res.json(conteudo);
     } catch (err) {
         res.status(500).json({

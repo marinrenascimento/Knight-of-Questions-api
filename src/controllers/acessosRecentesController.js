@@ -15,12 +15,13 @@ export class AcessosRecentesController {
       const deckRecente = await sequelize.query(
         `
         SELECT 
-          deck_review.*,
-          deck.*
-        FROM deck_review
-        INNER JOIN deck ON deck.id = deck_review.deck_id
-        WHERE deck_review.user_id = :userId
-        ORDER BY deck_review.created_at DESC
+          dr.*,
+          d.nome as deck_nome,
+          d.descricao as deck_descricao
+        FROM "DeckReviews" dr
+        INNER JOIN "Decks" d ON d.id = dr.id_deck
+        WHERE dr.id_usuario = :userId
+        ORDER BY dr.iniciado_em DESC
         LIMIT 1
         `,
         {
@@ -32,12 +33,13 @@ export class AcessosRecentesController {
       const avaliacaoRecente = await sequelize.query(
         `
         SELECT 
-          avaliacao_review.*,
-          avaliacao.*
-        FROM avaliacao_review
-        INNER JOIN avaliacao ON avaliacao.id = avaliacao_review.avaliacao_id
-        WHERE avaliacao_review.user_id = :userId
-        ORDER BY avaliacao_review.created_at DESC
+          ar.*,
+          a.titulo as avaliacao_titulo,
+          a.is_vestibular
+        FROM "AvaliacaoReviews" ar
+        INNER JOIN "Avaliacoes" a ON a.id = ar.id_avaliacao
+        WHERE ar.id_user = :userId
+        ORDER BY ar.iniciado_em DESC
         LIMIT 1
         `,
         {
