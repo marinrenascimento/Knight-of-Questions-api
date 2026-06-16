@@ -1,6 +1,7 @@
 import express from 'express';
 import 'dotenv/config';
 import { sequelize } from './src/config/sequelize.js';
+import cors from 'cors';
 
 import userRoutes from './src/routes/userRoutes.js';
 import sessaoRoutes from './src/routes/sessaoRoutes.js';
@@ -30,6 +31,7 @@ initModels();
 await bootstrapDb();
 const app = express();
 const port = Number.parseInt(process.env.PORT ?? '3000', 10);
+app.use(cors());
 
 app.use(express.json());
 
