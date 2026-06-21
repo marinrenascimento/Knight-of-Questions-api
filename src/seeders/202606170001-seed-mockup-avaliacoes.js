@@ -1,91 +1,116 @@
-export async function up({ queryInterface, Sequelize }) {
-  // Inserindo avaliações do mockup
-  await queryInterface.bulkInsert('Avaliacoes', [
-    { id: 2, titulo: 'Substantivos e Adjetivos', id_user: 1, is_vestibular: false },
-    { id: 3, titulo: 'Sistema Nervoso', id_user: 1, is_vestibular: false },
-    { id: 4, titulo: 'Primeira Guerra Mundial', id_user: 1, is_vestibular: false },
-    { id: 5, titulo: 'Renascimento', id_user: 1, is_vestibular: false },
-    { id: 6, titulo: 'Radiciação e Potenciação', id_user: 1, is_vestibular: false },
-    { id: 7, titulo: 'Guerra Fria', id_user: 1, is_vestibular: false },
+export async function up({ queryInterface }) {
+  // Dados das avaliações do mockup (sem id fixo — o banco gera automaticamente)
+  const avaliacoesParaCriar = [
+    { titulo: 'Substantivos e Adjetivos', id_user: 1, is_vestibular: false },
+    { titulo: 'Sistema Nervoso', id_user: 1, is_vestibular: false },
+    { titulo: 'Primeira Guerra Mundial', id_user: 1, is_vestibular: false },
+    { titulo: 'Renascimento', id_user: 1, is_vestibular: false },
+    { titulo: 'Radiciação e Potenciação', id_user: 1, is_vestibular: false },
+    { titulo: 'Guerra Fria', id_user: 1, is_vestibular: false },
 
-    { id: 8, titulo: 'ENEM 2015', id_user: null, is_vestibular: true },
-    { id: 9, titulo: 'ITA 2014', id_user: null, is_vestibular: true },
-    { id: 10, titulo: 'FUVEST 2016', id_user: null, is_vestibular: true },
-    { id: 11, titulo: 'UNICAMP 2018', id_user: null, is_vestibular: true },
-    { id: 12, titulo: 'ENEM 2020', id_user: null, is_vestibular: true },
-  ], { ignoreDuplicates: true });
+    { titulo: 'ENEM 2015', id_user: null, is_vestibular: true },
+    { titulo: 'ITA 2014', id_user: null, is_vestibular: true },
+    { titulo: 'FUVEST 2016', id_user: null, is_vestibular: true },
+    { titulo: 'UNICAMP 2018', id_user: null, is_vestibular: true },
+    { titulo: 'ENEM 2020', id_user: null, is_vestibular: true },
+  ];
 
-  await queryInterface.bulkUpdate('Avaliacoes', { titulo: 'ENEM 2015' }, { id: 8 });
-  await queryInterface.bulkUpdate('Avaliacoes', { titulo: 'ITA 2014' }, { id: 9 });
-  await queryInterface.bulkUpdate('Avaliacoes', { titulo: 'FUVEST 2016' }, { id: 10 });
+  const avaliacoesInseridas = await queryInterface.bulkInsert('Avaliacoes', avaliacoesParaCriar, { returning: true });
 
-  // Inserindo perguntas fictícias para bater com a quantidade de questões do mockup
-  const questions = [];
-  const alternativas = [];
-  let questionId = 100;
-  let alternativaId = 1000;
+  // Mapeia titulo -> id real gerado pelo banco (em vez de id fixo)
+  const idPorTitulo = {};
+  avaliacoesInseridas.forEach((row) => {
+    idPorTitulo[row.titulo] = row.id;
+  });
 
+  // Mapeamento realístico de ID da Disciplina para IDs de Conteúdos válidos
+  const relacaoDisciplinaConteudo = {
+    1: [1, 2, 3, 4],       // Matemática
+    2: [5, 6, 7, 8],       // História
+    3: [9, 10, 11, 12],    // Biologia
+    4: [13, 14, 15, 16],   // Física
+    5: [17, 18, 19, 20],   // Química
+    6: [21, 22, 23],       // Português
+    7: [24, 25, 26],       // Literatura
+    8: [27, 28, 29],       // Geografia
+    9: [30, 31],           // Filosofia
+    10: [32, 33],          // Sociologia
+  };
+
+  const disciplinasDisponiveis = Object.keys(relacaoDisciplinaConteudo).map(Number);
+
+  // Quantidade de questões por título de avaliação
   const countMap = {
-    2: 53,
-    3: 15,
-    4: 27,
-    5: 231,
-    6: 5,
-    7: 38,
-    8: 90,
-    9: 72,
-    10: 180,
-    11: 64,
-    12: 90
+    'Substantivos e Adjetivos': 53,
+    'Sistema Nervoso': 15,
+    'Primeira Guerra Mundial': 27,
+    'Renascimento': 231,
+    'Radiciação e Potenciação': 5,
+    'Guerra Fria': 38,
+    'ENEM 2015': 90,
+    'ITA 2014': 72,
+    'FUVEST 2016': 180,
+    'UNICAMP 2018': 64,
+    'ENEM 2020': 90,
   };
 
-  const metaMap = {
-    2: { disciplina_id: 1, conteudo_id: 6 },
-    3: { disciplina_id: 3, conteudo_id: 3 },
-    4: { disciplina_id: 2, conteudo_id: 2 },
-    5: { disciplina_id: 2, conteudo_id: 8 },
-    6: { disciplina_id: 1, conteudo_id: 7 },
-    7: { disciplina_id: 2, conteudo_id: 2 },
-    8: { disciplina_id: 1, conteudo_id: 1 },
-    9: { disciplina_id: 4, conteudo_id: 4 },
-    10: { disciplina_id: 1, conteudo_id: 6 },
-    11: { disciplina_id: 3, conteudo_id: 10 },
-    12: { disciplina_id: 5, conteudo_id: 5 }
+  // Avaliações focadas em uma única disciplina (is_vestibular: false)
+  const escopoFocado = {
+    'Substantivos e Adjetivos': { disc: 6, conts: [21, 22, 23] },
+    'Sistema Nervoso': { disc: 3, conts: [9] },
+    'Primeira Guerra Mundial': { disc: 2, conts: [5] },
+    'Renascimento': { disc: 2, conts: [8] },
+    'Radiciação e Potenciação': { disc: 1, conts: [4] },
+    'Guerra Fria': { disc: 2, conts: [5] },
   };
 
-  for (const [avaliacaoId, count] of Object.entries(countMap)) {
-    const aid = parseInt(avaliacaoId, 10);
-    const meta = metaMap[aid] || { disciplina_id: 1, conteudo_id: 1 };
+  const questions = [];
+
+  for (const [titulo, count] of Object.entries(countMap)) {
+    const aid = idPorTitulo[titulo];
+    const eFocado = escopoFocado[titulo];
+
     for (let i = 1; i <= count; i++) {
+      let dId;
+      let cId;
+
+      if (eFocado) {
+        dId = eFocado.disc;
+        const listaConts = eFocado.conts;
+        cId = listaConts[(i - 1) % listaConts.length];
+      } else {
+        dId = disciplinasDisponiveis[(i - 1) % disciplinasDisponiveis.length];
+        const listaConts = relacaoDisciplinaConteudo[dId];
+        cId = listaConts[Math.floor((i - 1) / disciplinasDisponiveis.length) % listaConts.length];
+      }
+
       questions.push({
-        id: questionId++,
-        enunciado: `Pergunta Exemplo ${i} da Avaliação ${aid}`,
-        nivel_dificuldade: 1,
-        disciplina_id: meta.disciplina_id,
-        conteudo_id: meta.conteudo_id,
-        id_avaliacao: aid
+        enunciado: `Questão ${i} da Avaliação "${titulo}" - Disciplina ID ${dId}, Conteúdo ID ${cId}`,
+        nivel_dificuldade: (i % 3) + 1,
+        disciplina_id: dId,
+        conteudo_id: cId,
+        id_avaliacao: aid,
       });
-      const idPergunta = questionId - 1;
-      alternativas.push(
-        { id: alternativaId++, texto: 'Alternativa correta', is_correta: true, id_pergunta: idPergunta, descricao: 'Resposta correta para a pergunta de exemplo.' },
-        { id: alternativaId++, texto: 'Alternativa A', is_correta: false, id_pergunta: idPergunta, descricao: 'Resposta incorreta.' },
-        { id: alternativaId++, texto: 'Alternativa B', is_correta: false, id_pergunta: idPergunta, descricao: 'Resposta incorreta.' },
-        { id: alternativaId++, texto: 'Alternativa C', is_correta: false, id_pergunta: idPergunta, descricao: 'Resposta incorreta.' }
-      );
     }
   }
 
-  await queryInterface.bulkInsert('Perguntas', questions, { ignoreDuplicates: true });
-  await queryInterface.bulkInsert('Alternativas', alternativas, { ignoreDuplicates: true });
+  const perguntasInseridas = await queryInterface.bulkInsert('Perguntas', questions, { returning: true });
 
-  // Atualizando os sequenciadores
-  await queryInterface.sequelize.query(`SELECT setval('"Avaliacoes_id_seq"', (SELECT MAX(id) FROM "Avaliacoes"));`);
-  await queryInterface.sequelize.query(`SELECT setval('"Perguntas_id_seq"', (SELECT MAX(id) FROM "Perguntas"));`);
-  await queryInterface.sequelize.query(`SELECT setval('"Alternativas_id_seq"', (SELECT MAX(id) FROM "Alternativas"));`);
+  // Cria as 4 alternativas de cada pergunta, usando o id real retornado pelo banco
+  const alternativas = [];
+  perguntasInseridas.forEach((pergunta) => {
+    alternativas.push(
+      { texto: 'Alternativa A (Correta)', is_correta: true, id_pergunta: pergunta.id, descricao: 'Explicação detalhada da resposta correta.' },
+      { texto: 'Alternativa B', is_correta: false, id_pergunta: pergunta.id, descricao: 'Distrator comum.' },
+      { texto: 'Alternativa C', is_correta: false, id_pergunta: pergunta.id, descricao: 'Análise incorreta do enunciado.' },
+      { texto: 'Alternativa D', is_correta: false, id_pergunta: pergunta.id, descricao: 'Dados não condizem com a teoria.' },
+    );
+  });
+
+  await queryInterface.bulkInsert('Alternativas', alternativas);
 }
 
-export async function down({ queryInterface, Sequelize }) {
-  await queryInterface.bulkDelete('Alternativas', { id: { [Sequelize.Op.gte]: 1000 } }, {});
-  await queryInterface.bulkDelete('Perguntas', { id: { [Sequelize.Op.gte]: 100 } }, {});
-  await queryInterface.bulkDelete('Avaliacoes', { id: { [Sequelize.Op.in]: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] } }, {});
+export async function down({ queryInterface }) {
+  // O runner deste projeto (src/db/runSeeders.js) só chama "up" — "down" não é
+  // executado em nenhum fluxo atual. Mantido apenas como documentação.
 }

@@ -110,6 +110,7 @@ export const getAllAvaliacoesByUser = async (req, res) => {
     }
 };
 
+
 export const getAllAvaliacoesVestibulares = async (req, res) => {
     try {
         const avaliacoes = await Avaliacao.findAll({
@@ -117,7 +118,12 @@ export const getAllAvaliacoesVestibulares = async (req, res) => {
             include: [{
                 model: Pergunta,
                 as: 'perguntas',
-                attributes: ['id']
+                attributes: ['id'],
+                include: [{
+                    model: Alternativa,
+                    as: 'alternativas',
+                    attributes: ['id', 'texto', 'is_correta', 'descricao']
+                }]
             }]
         });
         res.json(avaliacoes);
