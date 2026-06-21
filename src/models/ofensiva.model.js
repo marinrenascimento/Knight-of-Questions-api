@@ -19,6 +19,11 @@ UserOfensiva.init(
     sequencia_dias: {
       type: DataTypes.INTEGER,
       defaultValue: 0
+    },
+
+    data_ultima_atualizacao: {
+      type: DataTypes.DATEONLY,
+      allowNull: true
     }
 
   },
