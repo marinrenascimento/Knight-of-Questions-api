@@ -78,7 +78,7 @@ export const getPontosByUser = async (req, res) => {
 export const addPontosByUser = async (req, res) => {
   try {
     const id_usuario = req.authUser.id;
-    const { acao, quantidade } = req.body ?? {};
+    const { acao, quantidade, pontosGanhos } = req.body ?? {};
 
     if (!acao) {
       return res.status(400).json({ message: 'Ação é obrigatória.' });
@@ -90,20 +90,28 @@ export const addPontosByUser = async (req, res) => {
       });
     }
 
-    if (!quantidade || quantidade <= 0) {
-      return res.status(400).json({ message: 'Quantidade inválida.' });
+    let finalPontosGanhos = 0;
+    if (pontosGanhos !== undefined) {
+      const parsedPoints = parseInt(pontosGanhos, 10);
+      if (isNaN(parsedPoints) || parsedPoints < 0) {
+        return res.status(400).json({ message: 'pontosGanhos inválido.' });
+      }
+      finalPontosGanhos = parsedPoints;
+    } else {
+      if (!quantidade || quantidade <= 0) {
+        return res.status(400).json({ message: 'Quantidade inválida.' });
+      }
+      finalPontosGanhos = TABELA_PONTOS[acao] * quantidade;
     }
-
-    const pontosGanhos = TABELA_PONTOS[acao] * quantidade;
 
     const historico = await HistoricoPontos.create({
       id_usuario,
       acao,
-      pontos_ganhos: pontosGanhos
+      pontos_ganhos: finalPontosGanhos
     });
 
     const user = await User.findByPk(id_usuario);
-    user.pontos += pontosGanhos;
+    user.pontos += finalPontosGanhos;
 
     const nivelCalculado = Math.floor(user.pontos / 1000);
     let subiuDeNivel = false;
@@ -119,7 +127,7 @@ export const addPontosByUser = async (req, res) => {
 
     res.status(200).json({
       message: 'Pontos adicionados com sucesso.',
-      pontos_ganhos: pontosGanhos,
+      pontos_ganhos: finalPontosGanhos,
       pontos_totais: user.pontos,
       subiu_de_nivel: subiuDeNivel,
       nivel_atual: user.nivel,
