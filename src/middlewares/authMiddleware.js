@@ -43,8 +43,8 @@ export const requireRole = (...allowedRoles) => (req, res, next) => {
 
 const rolePermissions = {
     admin: ['users:read', 'users:update', 'flashcards:read', 'flashcards:create', 'flashcards:update', 'flashcards:delete', 'avatar:read', 'avatar:update'],
-    estudante: [],
-    visitante: []
+    estudante: ['users:read', 'users:update'],
+    visitante: ['users:read', 'users:update']
 };
 
 export const requirePermission = (permission) => (req, res, next) => {

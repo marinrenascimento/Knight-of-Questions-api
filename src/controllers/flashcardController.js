@@ -1,4 +1,4 @@
-import { Flashcard, User } from '../models/index.js';
+import { Flashcard, User, HistoricoPontos } from '../models/index.js';
 import { sequelize } from '../config/sequelize.js';
 
 /**
@@ -109,10 +109,10 @@ export const createCard = async (req, res) => {
 export const editCard = async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
-        const { frente, verso } = req.body ?? {};
+        const { frente, verso, id_disciplina, id_conteudo } = req.body ?? {};
         
-        if (frente === undefined && verso === undefined) {
-            return res.status(400).json({ message: 'Ao menos um campo (frente ou verso) deve ser fornecido' });
+        if (frente === undefined && verso === undefined && id_disciplina === undefined && id_conteudo === undefined) {
+            return res.status(400).json({ message: 'Ao menos um campo deve ser fornecido para atualização' });
         }
         
         const card = await Flashcard.findByPk(id);
@@ -121,6 +121,8 @@ export const editCard = async (req, res) => {
         const updateData = {};
         if (frente !== undefined) updateData.frente = frente;
         if (verso !== undefined) updateData.verso = verso;
+        if (id_disciplina !== undefined) updateData.id_disciplina = id_disciplina;
+        if (id_conteudo !== undefined) updateData.id_conteudo = id_conteudo;
 
         await card.update(updateData);
         res.json(card);
@@ -173,7 +175,21 @@ export const reviewCard = async (req, res) => {
         
         if (pontosGanhos && id_user) {
             const user = await User.findByPk(id_user, { transaction });
-            if (user) await user.update({ pontos: user.pontos + parseInt(pontosGanhos, 10) }, { transaction });
+            if (user) {
+                const novosPontos = user.pontos + parseInt(pontosGanhos, 10);
+                const nivelCalculado = Math.floor(novosPontos / 1000);
+                await user.update({ 
+                    pontos: novosPontos,
+                    nivel: nivelCalculado
+                }, { transaction });
+
+                // Create points history record for monthly/weekly reports
+                await HistoricoPontos.create({
+                    id_usuario: id_user,
+                    acao: 'cards',
+                    pontos_ganhos: parseInt(pontosGanhos, 10)
+                }, { transaction });
+            }
         }
         
         await transaction.commit();

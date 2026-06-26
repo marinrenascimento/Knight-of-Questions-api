@@ -62,17 +62,8 @@ export const finishDeckReview = async (req, res) => {
     review.qtd_flashcards_revisados = qtd_flashcards_revisados;
     await review.save();
 
-    const pontosGanhos = qtd_flashcards_revisados * 5;
-    const user = await User.findByPk(id_usuario);
-    if (user) {
-      user.pontos += pontosGanhos;
-      await user.save();
-    }
-
     res.json({
       message: 'Revisão finalizada com sucesso.',
-      pontos_ganhos: pontosGanhos,
-      pontos_totais: user ? user.pontos : 0,
       review
     });
   } catch (err) {

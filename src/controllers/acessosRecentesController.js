@@ -10,7 +10,8 @@ export class AcessosRecentesController {
    */
   static async getAllAcessosRecentesByUser(req, res) {
     try {
-      const { userId } = req.params;
+      const { id, userId } = req.params;
+      const actualUserId = id || userId;
 
       const deckRecente = await sequelize.query(
         `
@@ -25,7 +26,7 @@ export class AcessosRecentesController {
         LIMIT 1
         `,
         {
-          replacements: { userId },
+          replacements: { userId: actualUserId },
           type: QueryTypes.SELECT
         }
       );
@@ -43,7 +44,7 @@ export class AcessosRecentesController {
         LIMIT 1
         `,
         {
-          replacements: { userId },
+          replacements: { userId: actualUserId },
           type: QueryTypes.SELECT
         }
       );

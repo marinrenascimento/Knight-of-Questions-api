@@ -19,6 +19,11 @@ export async function up({ queryInterface, Sequelize }) {
       type: Sequelize.INTEGER,
       defaultValue: 0,
     },
+    data_ultima_atualizacao: {
+      type: Sequelize.DATE,
+      allowNull: false,
+      defaultValue: Sequelize.NOW
+    }
   });
 }
 

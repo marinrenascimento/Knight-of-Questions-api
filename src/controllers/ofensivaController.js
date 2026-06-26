@@ -1,12 +1,15 @@
 import { UserOfensiva, User } from "../models/index.js";
 
+function formatDateOnly(value) {
+  if (!value) return null;
+  if (value instanceof Date) {
+    return value.toISOString().slice(0, 10);
+  }
+  return String(value).slice(0, 10);
+}
+
 export class OfensivaController {
 
-  /**
-   * GET /ofensiva
-   * 
-   * Busca a ofensiva atual do usuário logado
-   */
   static async getOfensivaByUser(req, res) {
     try {
       const id_usuario = req.authUser.id;
@@ -42,13 +45,14 @@ export class OfensivaController {
 
   /**
    * POST /ofensiva/update
-   * 
-   * Atualiza a ofensiva do usuário logado
+   *
+   * Atualiza a ofensiva do usuário logado, no máximo uma vez por dia.
    */
   static async updateOfensiva(req, res) {
     try {
       const id_usuario = req.authUser.id;
       const acao = req.body?.acao ?? null;
+      const hoje = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
 
       let ofensiva = await UserOfensiva.findOne({
         where: { user_id: id_usuario }
@@ -57,7 +61,8 @@ export class OfensivaController {
       if (!ofensiva) {
         ofensiva = await UserOfensiva.create({
           user_id: id_usuario,
-          sequencia_dias: 1
+          sequencia_dias: 1,
+          data_ultima_atualizacao: hoje
         });
 
         return res.status(201).json({
@@ -68,9 +73,26 @@ export class OfensivaController {
 
       if (acao === "zerar") {
         ofensiva.sequencia_dias = 0;
-      } else {
-        ofensiva.sequencia_dias += 1;
+        ofensiva.data_ultima_atualizacao = hoje;
+        await ofensiva.save();
+
+        return res.status(200).json({
+          message: "Ofensiva zerada com sucesso",
+          ofensiva
+        });
       }
+
+      const ultimaAtualizacao = formatDateOnly(ofensiva.data_ultima_atualizacao);
+
+      if (ultimaAtualizacao === hoje) {
+        return res.status(200).json({
+          message: "Ofensiva já atualizada hoje",
+          ofensiva
+        });
+      }
+
+      ofensiva.sequencia_dias += 1;
+      ofensiva.data_ultima_atualizacao = hoje;
 
       await ofensiva.save();
 

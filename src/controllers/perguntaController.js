@@ -1,5 +1,6 @@
 import { Pergunta, Alternativa, RespostaUsuario, User } from '../models/index.js';
 import { sequelize } from '../config/sequelize.js';
+import { Op } from 'sequelize';
 
 export const getPerguntasByAvaliacao = async (req, res) => {
     try {
@@ -32,26 +33,90 @@ export const getPerguntasByFiltro = async (req, res) => {
 };
 
 export const createPergunta = async (req, res) => {
+    const transaction = await sequelize.transaction();
     try {
-        const { enunciado, nivel_dificuldade, disciplina_id, conteudo_id, id_avaliacao } = req.body;
+        const { enunciado, nivel_dificuldade, disciplina_id, conteudo_id, id_avaliacao, alternativas } = req.body;
         const pergunta = await Pergunta.create({
             enunciado, nivel_dificuldade, disciplina_id, conteudo_id, id_avaliacao
+        }, { transaction });
+
+        if (Array.isArray(alternativas)) {
+            for (const alternativa of alternativas) {
+                if (!alternativa.texto) continue;
+                await Alternativa.create({
+                    texto: alternativa.texto,
+                    is_correta: !!alternativa.is_correta,
+                    descricao: alternativa.descricao,
+                    id_pergunta: pergunta.id
+                }, { transaction });
+            }
+        }
+
+        const perguntaCompleta = await Pergunta.findByPk(pergunta.id, {
+            include: [{ model: Alternativa, as: 'alternativas' }],
+            transaction
         });
-        res.status(201).json(pergunta);
+        await transaction.commit();
+        res.status(201).json(perguntaCompleta);
     } catch (err) {
+        await transaction.rollback();
         res.status(500).json({ message: 'Erro ao criar pergunta', error: err.message });
     }
 };
 
 export const updatePergunta = async (req, res) => {
+    const transaction = await sequelize.transaction();
     try {
         const id = parseInt(req.params.id, 10);
-        const { enunciado, nivel_dificuldade, disciplina_id, conteudo_id } = req.body;
-        const pergunta = await Pergunta.findByPk(id);
-        if (!pergunta) return res.status(404).json({ message: 'Pergunta não encontrada' });
-        await pergunta.update({ enunciado, nivel_dificuldade, disciplina_id, conteudo_id });
-        res.json(pergunta);
+        const { enunciado, nivel_dificuldade, disciplina_id, conteudo_id, alternativas } = req.body;
+        const pergunta = await Pergunta.findByPk(id, { transaction });
+        if (!pergunta) {
+            await transaction.rollback();
+            return res.status(404).json({ message: 'Pergunta não encontrada' });
+        }
+
+        await pergunta.update({ enunciado, nivel_dificuldade, disciplina_id, conteudo_id }, { transaction });
+
+        if (Array.isArray(alternativas)) {
+            const idsRecebidos = alternativas.filter((alt) => alt.id).map((alt) => alt.id);
+            await Alternativa.destroy({
+                where: {
+                    id_pergunta: id,
+                    ...(idsRecebidos.length > 0 && { id: { [Op.notIn]: idsRecebidos } })
+                },
+                transaction
+            });
+
+            for (const alternativa of alternativas) {
+                if (!alternativa.texto) continue;
+                if (alternativa.id) {
+                    await Alternativa.update({
+                        texto: alternativa.texto,
+                        is_correta: !!alternativa.is_correta,
+                        descricao: alternativa.descricao
+                    }, {
+                        where: { id: alternativa.id, id_pergunta: id },
+                        transaction
+                    });
+                } else {
+                    await Alternativa.create({
+                        texto: alternativa.texto,
+                        is_correta: !!alternativa.is_correta,
+                        descricao: alternativa.descricao,
+                        id_pergunta: id
+                    }, { transaction });
+                }
+            }
+        }
+
+        const perguntaCompleta = await Pergunta.findByPk(id, {
+            include: [{ model: Alternativa, as: 'alternativas' }],
+            transaction
+        });
+        await transaction.commit();
+        res.json(perguntaCompleta);
     } catch (err) {
+        await transaction.rollback();
         res.status(500).json({ message: 'Erro ao atualizar pergunta', error: err.message });
     }
 };

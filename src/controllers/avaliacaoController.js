@@ -1,31 +1,131 @@
-import { Avaliacao, Pergunta, Alternativa } from '../models/index.js';
+import { Avaliacao, Pergunta, Alternativa, Disciplina, Conteudo } from '../models/index.js';
 import { sequelize } from '../config/sequelize.js';
 
 export const getAvaliacaoById = async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
         const avaliacao = await Avaliacao.findByPk(id);
-        const perguntas = await Pergunta.findAll({ where: { id_avaliacao: id } });
         if (!avaliacao) return res.status(404).json({ message: 'Avaliação não encontrada' });
+        const perguntas = await Pergunta.findAll({
+            where: { id_avaliacao: id },
+            include: [
+                { model: Alternativa, as: 'alternativas' },
+                { model: Disciplina, as: 'disciplina', attributes: ['id', 'nome'] },
+                { model: Conteudo, as: 'conteudo', attributes: ['id', 'nome'] }
+            ],
+            order: [
+                ['id', 'ASC'],
+                [{ model: Alternativa, as: 'alternativas' }, 'id', 'ASC']
+            ]
+        });
         res.json({ ...avaliacao.toJSON(), perguntas });
     } catch (err) {
         res.status(500).json({ message: 'Erro ao buscar avaliação', error: err.message });
     }
 };
 
+export const createAvaliacaoPorDisciplina = async (req, res) => {
+    const transaction = await sequelize.transaction();
+    try {
+        const { disciplina_id, conteudo_id, quantidade, id_user } = req.body;
+        const limite = parseInt(quantidade, 10);
+
+        if (!disciplina_id || !conteudo_id || !limite || limite < 1 || !id_user) {
+            await transaction.rollback();
+            return res.status(400).json({ message: 'Disciplina, conteúdo, quantidade e usuário são obrigatórios.' });
+        }
+
+        const disciplina = await Disciplina.findByPk(disciplina_id, { transaction });
+        const conteudo = await Conteudo.findByPk(conteudo_id, { transaction });
+
+        if (!disciplina || !conteudo) {
+            await transaction.rollback();
+            return res.status(404).json({ message: 'Disciplina ou conteúdo não encontrado.' });
+        }
+
+        const perguntas = await Pergunta.findAll({
+            where: { disciplina_id, conteudo_id },
+            include: [{ model: Alternativa, as: 'alternativas' }],
+            order: sequelize.random(),
+            limit: limite,
+            transaction
+        });
+
+        if (perguntas.length === 0) {
+            await transaction.rollback();
+            return res.status(404).json({ message: 'Nenhuma questão encontrada para esta disciplina e conteúdo.' });
+        }
+
+        const novaAvaliacao = await Avaliacao.create({
+            titulo: `${disciplina.nome} - ${conteudo.nome}`,
+            is_vestibular: false,
+            id_user
+        }, { transaction });
+
+        for (const pergunta of perguntas) {
+            const novaPergunta = await Pergunta.create({
+                enunciado: pergunta.enunciado,
+                nivel_dificuldade: pergunta.nivel_dificuldade,
+                disciplina_id: pergunta.disciplina_id,
+                conteudo_id: pergunta.conteudo_id,
+                id_avaliacao: novaAvaliacao.id
+            }, { transaction });
+
+            for (const alternativa of pergunta.alternativas || []) {
+                await Alternativa.create({
+                    texto: alternativa.texto,
+                    is_correta: alternativa.is_correta,
+                    descricao: alternativa.descricao,
+                    id_pergunta: novaPergunta.id
+                }, { transaction });
+            }
+        }
+
+        await transaction.commit();
+        res.status(201).json({
+            message: 'Prova personalizada criada com sucesso!',
+            avaliacao: novaAvaliacao,
+            questoes_adicionadas: perguntas.length
+        });
+    } catch (err) {
+        await transaction.rollback();
+        res.status(500).json({ message: 'Erro ao criar prova personalizada', error: err.message });
+    }
+};
+
 export const getAllAvaliacoesByUser = async (req, res) => {
     try {
         const userId = parseInt(req.params.userId, 10);
-        const avaliacoes = await Avaliacao.findAll({ where: { id_user: userId } });
+        const avaliacoes = await Avaliacao.findAll({
+            where: { id_user: userId },
+            include: [{
+                model: Pergunta,
+                as: 'perguntas',
+                attributes: ['id']
+            }]
+        });
         res.json(avaliacoes);
     } catch (err) {
         res.status(500).json({ message: 'Erro ao buscar avaliações', error: err.message });
     }
 };
 
+
 export const getAllAvaliacoesVestibulares = async (req, res) => {
     try {
-        const avaliacoes = await Avaliacao.findAll({ where: { is_vestibular: true, id_user: null } });
+        const avaliacoes = await Avaliacao.findAll({
+            where: { is_vestibular: true, id_user: null },
+            include: [{
+                model: Pergunta,
+                as: 'perguntas',
+                attributes: ['id'],
+                include: [{
+                    model: Alternativa,
+                    as: 'alternativas',
+                    attributes: ['id', 'texto', 'is_correta', 'descricao']
+                }]
+            }]
+        });
         res.json(avaliacoes);
     } catch (err) {
         res.status(500).json({ message: 'Erro ao buscar avaliações', error: err.message });

@@ -3,6 +3,6 @@ import { AcessosRecentesController } from "../controllers/acessosRecentesControl
 
 const router = express.Router();
 
-router.get("/:userId", AcessosRecentesController.getAllAcessosRecentesByUser);
+router.get("/:id", AcessosRecentesController.getAllAcessosRecentesByUser);
 
 export default router;
